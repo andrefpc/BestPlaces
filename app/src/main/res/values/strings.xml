@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">BestPlaces</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="title_activity_base">BaseActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_street_view">StreetViewActivity</string>
+    <string name="title_activity_registration">RegistrationActivity</string>
+    <string name="title_activity_chose_preferences">ChosePreferencesActivity</string>
+    <string name="title_activity_no_connection">NoConnectionActivity</string>
+</resources>
