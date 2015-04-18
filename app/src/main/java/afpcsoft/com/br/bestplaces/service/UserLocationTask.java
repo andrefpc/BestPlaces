@@ -109,7 +109,6 @@ public class UserLocationTask extends AsyncTask<String, Void, LocalResult> {
                 break;
 
             } else {
-                Toast.makeText(context, " Location not available", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -120,19 +119,19 @@ public class UserLocationTask extends AsyncTask<String, Void, LocalResult> {
 
             myLocal.setLocation(location);
 
-            List<Address> addresses = null;
-            GeocoderAsync = new Geocoder(context, Locale.getDefault());
-            try {
-                addresses = GeocoderAsync.getFromLocation(latAsync, lonAsync, 1);
-
-                //            String address = addresses.get(0).getAddressLine(0);
-                //            String city = addresses.get(0).getAddressLine(1);
-
-                //            myLocal.setLogradouro(address);
-                //            myLocal.setEstado(city);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            List<Address> addresses = null;
+//            GeocoderAsync = new Geocoder(context, Locale.getDefault());
+//            try {
+//                addresses = GeocoderAsync.getFromLocation(latAsync, lonAsync, 1);
+//
+//                            String address = addresses.get(0).getAddressLine(0);
+//                            String city = addresses.get(0).getAddressLine(1);
+//
+//                            myLocal.setLogradouro(address);
+//                            myLocal.setEstado(city);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
             localResult.setOnPostFlag(LocalResult.MYLOCAL);
             localResult.setMyLocal(myLocal);

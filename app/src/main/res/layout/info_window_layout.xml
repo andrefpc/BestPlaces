@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content" android:layout_height="wrap_content"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutInfoWindow"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:background="@drawable/shape_frame"
     android:orientation="vertical">
 
@@ -71,7 +74,7 @@
         <TextView
             android:id="@+id/textInfo"
             android:text="* Clique para mais informações"
-            android:textColor="#FF0000"
+            android:textColor="#BFBFBF"
             android:textSize="10sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -4,8 +4,9 @@
     <string name="title_activity_base">BaseActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_street_view">StreetViewActivity</string>
-    <string name="title_activity_registration">RegistrationActivity</string>
-    <string name="title_activity_chose_preferences">ChosePreferencesActivity</string>
-    <string name="title_activity_no_connection">NoConnectionActivity</string>
+    <string name="title_activity_street_view">StreetView</string>
+    <string name="title_activity_search_view">Search</string>
+    <string name="title_activity_registration">Registration</string>
+    <string name="title_activity_chose_preferences">ChosePreferences</string>
+    <string name="title_activity_no_connection">NoConnection</string>
 </resources>

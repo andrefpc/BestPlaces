@@ -1,20 +1,11 @@
 package afpcsoft.com.br.bestplaces.controller;
 
-import android.annotation.TargetApi;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Outline;
-import android.location.Location;
-import android.location.LocationManager;
-import android.media.Image;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewOutlineProvider;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
@@ -23,23 +14,19 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import afpcsoft.com.br.bestplaces.dao.UserDAO;
 import afpcsoft.com.br.bestplaces.Enums.BandeiraPostoEnum;
 import afpcsoft.com.br.bestplaces.Enums.FastFoodTypeEnum;
 import afpcsoft.com.br.bestplaces.R;
@@ -55,11 +42,13 @@ import afpcsoft.com.br.bestplaces.model.Posto;
 import afpcsoft.com.br.bestplaces.model.Restaurante;
 import afpcsoft.com.br.bestplaces.service.EstacionamentoLocationsTask;
 import afpcsoft.com.br.bestplaces.service.FastFoodLocationsTask;
-import afpcsoft.com.br.bestplaces.service.MyLocation;
 import afpcsoft.com.br.bestplaces.service.PostoLocationsTask;
 import afpcsoft.com.br.bestplaces.service.UserLocationTask;
 
-public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChangeListener, UserLocationTask.OnPostExecuteListener, PostoLocationsTask.OnPostExecuteListener, EstacionamentoLocationsTask.OnPostExecuteListener, FastFoodLocationsTask.OnPostExecuteListener {
+/**
+ * Created by AndréFelipe on 17/04/2015.
+ */
+public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraChangeListener, UserLocationTask.OnPostExecuteListener, PostoLocationsTask.OnPostExecuteListener, EstacionamentoLocationsTask.OnPostExecuteListener, FastFoodLocationsTask.OnPostExecuteListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private MarkerOptions myLocationMarker;
@@ -69,8 +58,13 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
     private Button goToInfoWindow;
     private String urlInfoWindow;
     private ViewGroup viewGroup;
-    private ImageButton refresh;
     private RotateAnimation rotation;
+    private ImageView markerOffline;
+    private LatLng myLocationLatLng;
+    private Button setLocationBtn;
+    private ImageButton searchBtn;
+    private ImageButton refresh;
+    private ImageButton myLocal;
 
     private Map<Integer, Posto> postoMap;
     private Map<Integer, Bar> barMap;
@@ -91,7 +85,7 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_search);
 
         postoMap =  new HashMap<Integer, Posto>();
         barMap =  new HashMap<Integer, Bar>();
@@ -100,12 +94,90 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
         hospitalMap =  new HashMap<Integer, Hospital>();
         fastFoodMap =  new HashMap<Integer, FastFood>();
 
+        LatLng rioLatLng = new LatLng(-22.066452,-42.9232368);
+
+        cameraPosition = new CameraPosition.Builder()
+                .target(rioLatLng)      // Sets the center of the map to Mountain View
+                .zoom(5)                   // Sets the zoom
+                .build();
+
+
         rotation= new RotateAnimation(0f,360f, Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
         rotation.setDuration(600);
+
+        markerOffline = (ImageView) findViewById(R.id.marker_offline);
+        markerOffline.setVisibility(View.VISIBLE);
+
+        setLocationBtn = (Button) findViewById(R.id.setLocationBtn);
+        setLocationBtn.setVisibility(View.VISIBLE);
+        setLocationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                markerOffline.setVisibility(View.GONE);
+                v.setVisibility(View.GONE);
+                searchBtn.setVisibility(View.VISIBLE);
+                myLocal.setVisibility(View.VISIBLE);
+                refresh.setVisibility(View.VISIBLE);
+
+                mMap.addMarker(myLocationMarker.position(myLocationLatLng));
+
+                cameraPosition = new CameraPosition.Builder()
+                        .target(myLocationLatLng)      // Sets the center of the map to Mountain View
+                        .zoom(12)                   // Sets the zoom
+                        .build();
+
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+                new PostoLocationsTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude).execute();
+                new EstacionamentoLocationsTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude).execute();
+                new FastFoodLocationsTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude).execute();
+
+            }
+        });
 
         myLocationMarker = new MarkerOptions();
         myLocationMarker.title("You are here");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user));
+
+        myLocal = (ImageButton) findViewById(R.id.myLocationBtn);
+        myLocal.setVisibility(View.GONE);
+        myLocal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                rotation.setRepeatCount(RotateAnimation.ABSOLUTE);
+                v.startAnimation(rotation);
+                if(myLocationMarker != null && myLocationMarker.getPosition() != null) {
+                    if (myLocationMarker.getPosition().latitude != 0 && myLocationMarker.getPosition().longitude != 0) {
+
+                        cameraPosition = new CameraPosition.Builder()
+                                .target(myLocationMarker.getPosition())      // Sets the center of the map to Mountain View
+                                .zoom(15)                   // Sets the zoom
+                                .build();
+
+                        //mMap.moveCamera(cameraUpdate);
+                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    }
+                }
+            }
+        });
+
+        refresh = (ImageButton) findViewById(R.id.refreshBtn);
+        refresh.setVisibility(View.GONE);
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                rotation.setRepeatCount(RotateAnimation.INFINITE);
+                refresh.startAnimation(rotation);
+
+                new PostoLocationsTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude).execute();
+                new EstacionamentoLocationsTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude).execute();
+                new FastFoodLocationsTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude).execute();
+
+
+            }
+        });
 
         ImageButton zoomIn = (ImageButton) findViewById(R.id.plusBtn);
         zoomIn.setOnClickListener(new View.OnClickListener() {
@@ -142,46 +214,18 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
             }
         });
 
-        ImageButton myLocal = (ImageButton) findViewById(R.id.myLocationBtn);
-        myLocal.setOnClickListener(new View.OnClickListener() {
+        searchBtn = (ImageButton) findViewById(R.id.searchBtn);
+        searchBtn.setVisibility(View.GONE);
+        searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                v.setVisibility(View.GONE);
+                refresh.setVisibility(View.GONE);
+                myLocal.setVisibility(View.GONE);
+                markerOffline.setVisibility(View.VISIBLE);
+                setLocationBtn.setVisibility(View.VISIBLE);
+                mMap.clear();
 
-                rotation.setRepeatCount(RotateAnimation.ABSOLUTE);
-                v.startAnimation(rotation);
-                if(myLocationMarker != null && myLocationMarker.getPosition() != null) {
-                    if (myLocationMarker.getPosition().latitude != 0 && myLocationMarker.getPosition().longitude != 0) {
-
-                         cameraPosition = new CameraPosition.Builder()
-                                .target(myLocationMarker.getPosition())      // Sets the center of the map to Mountain View
-                                .zoom(15)                   // Sets the zoom
-                                .build();
-
-                        //mMap.moveCamera(cameraUpdate);
-                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                    }
-                }
-            }
-        });
-
-        refresh = (ImageButton) findViewById(R.id.refreshBtn);
-        refresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                rotation.setRepeatCount(RotateAnimation.INFINITE);
-                refresh.startAnimation(rotation);
-
-                getUserLocation();
-            }
-        });
-
-        ImageButton search = (ImageButton) findViewById(R.id.searchBtn);
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MapsActivity.this, SearchActivity.class);
-                startActivity(intent);
             }
         });
 
@@ -189,8 +233,6 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
         initialize();
         leftMenu();
         rightMenu();
-
-
     }
 
     @Override
@@ -220,11 +262,11 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
 
             mMap.setOnCameraChangeListener(this);
 
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
-            }else{
-                getUserLocation();
             }
         }
     }
@@ -234,78 +276,18 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                Intent intent = new Intent(MapsActivity.this, StreetViewActivity.class);
+                Intent intent = new Intent(SearchActivity.this, StreetViewActivity.class);
                 intent.putExtra("lat", latLng.latitude);
                 intent.putExtra("lng", latLng.longitude);
                 startActivity(intent);
             }
         });
 
-        getUserLocation();
-    }
-
-    private void getUserLocation(){
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-
-            rotation.setRepeatCount(RotateAnimation.INFINITE);
-            refresh.startAnimation(rotation);
-            MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
-                @Override
-                public void gotLocation(Location location){
-                    mMap.clear();
-                    MyLocal myLocal = new MyLocal();
-                    myLocal.setLocation(location);
-                    generateMyLocalMarker(myLocal);
-
-                    new PostoLocationsTask(MapsActivity.this, MapsActivity.this, myLocal.getLocation().getLatitude(),myLocal.getLocation().getLongitude()).execute();
-                    new EstacionamentoLocationsTask(MapsActivity.this, MapsActivity.this, myLocal.getLocation().getLatitude(), myLocal.getLocation().getLongitude()).execute();
-                    new FastFoodLocationsTask(MapsActivity.this, MapsActivity.this, myLocal.getLocation().getLatitude(), myLocal.getLocation().getLongitude()).execute();
-
-                }
-            };
-            MyLocation myLocation = new MyLocation();
-            myLocation.getLocation(this, locationResult);
-
-        }else{
-            showGPSDisabledAlertToUser();
-        }
-    }
-
-    private void showGPSDisabledAlertToUser(){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setCancelable(false);
-        alertDialogBuilder.setMessage("Seu GPS está desligado, ative caso queira a localização real, caso não queira, você pode marcar sua própria localização.")
-                .setCancelable(false)
-                .setPositiveButton("Ativar GPS",
-                        new DialogInterface.OnClickListener(){
-                            public void onClick(DialogInterface dialog, int id){
-                                Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                startActivityForResult(callGPSSettingIntent, 0);
-                            }
-                        });
-        alertDialogBuilder.setNegativeButton("Colocar localiação",
-                new DialogInterface.OnClickListener(){
-                    public void onClick(DialogInterface dialog, int id){
-                        Intent intent = new Intent(MapsActivity.this, SearchActivity.class);
-                        startActivity(intent);
-                        finish();
-                        dialog.cancel();
-                    }
-                });
-        AlertDialog alert = alertDialogBuilder.create();
-        alert.show();
     }
 
     @Override
     public void onPostExecute(LocalResult localResult) {
-        if(localResult.getOnPostFlag() == LocalResult.MYLOCAL) {
-//            generateMyLocalMarker(localResult.getMyLocal());
-//            new PostoLocationsTask(MapsActivity.this, MapsActivity.this, localResult.getMyLocal().getLocation().getLatitude(),localResult.getMyLocal().getLocation().getLongitude()).execute();
-//            new EstacionamentoLocationsTask(MapsActivity.this, MapsActivity.this, localResult.getMyLocal().getLocation().getLatitude(), localResult.getMyLocal().getLocation().getLongitude()).execute();
-//            new FastFoodLocationsTask(MapsActivity.this, MapsActivity.this, localResult.getMyLocal().getLocation().getLatitude(), localResult.getMyLocal().getLocation().getLongitude()).execute();
-        }else if(localResult.getOnPostFlag() == LocalResult.POSTO){
+        if(localResult.getOnPostFlag() == LocalResult.POSTO){
             generatePostoMarkers(localResult.getPostos());
         }else if(localResult.getOnPostFlag() == LocalResult.FAST_FOOD){
             generateFastFoodMarkers(localResult.getFastFoods());
@@ -602,7 +584,7 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
                 imageStreetView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(MapsActivity.this, StreetViewActivity.class);
+                        Intent intent = new Intent(SearchActivity.this, StreetViewActivity.class);
                         intent.putExtra("lat", marker.getPosition().latitude);
                         intent.putExtra("lng", marker.getPosition().longitude);
                         startActivity(intent);
@@ -626,39 +608,9 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
     @Override
     public void onCameraChange(CameraPosition position) {
         // Get the center of the Map.
+            myLocationLatLng = position.target;
+            cameraPosition = position;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        // Check which request we're responding to
-//        if (requestCode == 0) {
-//            // Make sure the request was successful
-//            if (resultCode == RESULT_OK) {
-                LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                    mMap.clear();
-                    rotation.setRepeatCount(RotateAnimation.INFINITE);
-                    refresh.startAnimation(rotation);
-                    MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
-                        @Override
-                        public void gotLocation(Location location){
-                            mMap.clear();
-                            MyLocal myLocal = new MyLocal();
-                            myLocal.setLocation(location);
-                            generateMyLocalMarker(myLocal);
-
-                            new PostoLocationsTask(MapsActivity.this, MapsActivity.this, myLocal.getLocation().getLatitude(),myLocal.getLocation().getLongitude()).execute();
-                            new EstacionamentoLocationsTask(MapsActivity.this, MapsActivity.this, myLocal.getLocation().getLatitude(), myLocal.getLocation().getLongitude()).execute();
-                            new FastFoodLocationsTask(MapsActivity.this, MapsActivity.this, myLocal.getLocation().getLatitude(), myLocal.getLocation().getLongitude()).execute();
-
-                        }
-                    };
-                    MyLocation myLocation = new MyLocation();
-                    myLocation.getLocation(this, locationResult);
-
-                }
-//            }
-//        }
-    }
 }

@@ -25,8 +25,14 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <!--<service-->
+            <!--android:name=".service.GPSTracker"-->
+            <!--android:enabled="true"-->
+            <!--android:exported="true" >-->
+        <!--</service>-->
+
         <activity
-            android:name=".controller.RegistrationActivity"
+            android:name=".controller.MapsActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,13 +40,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".service.GPSTracker"
-            android:enabled="true"
-            android:exported="true" >
-        </service>
-
         <activity
             android:name=".controller.BaseActivity"
             android:label="@string/title_activity_base" >
@@ -50,8 +49,12 @@
             android:label="@string/title_activity_street_view" >
         </activity>
         <activity
-            android:name=".controller.MapsActivity"
-            android:label="@string/title_activity_maps" >
+            android:name=".controller.SearchActivity"
+            android:label="@string/title_activity_search_view" >
+        </activity>
+        <activity
+            android:name=".controller.RegistrationActivity"
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name=".controller.ChosePrefencesActivity"

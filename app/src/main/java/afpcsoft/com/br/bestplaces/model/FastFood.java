@@ -2,8 +2,7 @@ package afpcsoft.com.br.bestplaces.model;
 
 import java.io.Serializable;
 
-public class Estacionamento implements Serializable {
-
+public class FastFood implements Serializable {
     private int id;
     private String nome;
     private String descricao;
@@ -17,11 +16,12 @@ public class Estacionamento implements Serializable {
     private Double longitude;
     private String tel;
     private int rating;
+    private int tipo_id;
 
-    public Estacionamento() {
+    public FastFood() {
     }
 
-    public Estacionamento(int id, String nome, String descricao, String endComp, String logradouro, String numero, String bairro, String municipio, String estado, Double latitude, Double longitude, String tel, int rating) {
+    public FastFood(int id, String nome, String descricao, String endComp, String logradouro, String numero, String bairro, String municipio, String estado, Double latitude, Double longitude, String tel, int rating, int tipo_id) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -35,6 +35,7 @@ public class Estacionamento implements Serializable {
         this.longitude = longitude;
         this.tel = tel;
         this.rating = rating;
+        this.tipo_id = tipo_id;
     }
 
     public int getId() {
@@ -139,5 +140,13 @@ public class Estacionamento implements Serializable {
 
     public void setRating(int rating) {
         this.rating = rating;
+    }
+
+    public int getTipo_id() {
+        return tipo_id;
+    }
+
+    public void setTipo_id(int tipo_id) {
+        this.tipo_id = tipo_id;
     }
 }

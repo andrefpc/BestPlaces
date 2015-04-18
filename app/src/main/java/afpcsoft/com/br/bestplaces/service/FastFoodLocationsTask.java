@@ -1,15 +1,11 @@
 package afpcsoft.com.br.bestplaces.service;
 
-
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.location.Address;
-import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.text.Html;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -26,12 +22,12 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
+import afpcsoft.com.br.bestplaces.model.Estacionamento;
+import afpcsoft.com.br.bestplaces.model.FastFood;
 import afpcsoft.com.br.bestplaces.model.LocalResult;
-import afpcsoft.com.br.bestplaces.model.Posto;
 
-public class PostoLocationsTask extends AsyncTask<String, Void, LocalResult> {
+public class FastFoodLocationsTask extends AsyncTask<String, Void, LocalResult> {
     private Context context;
     private ProgressDialog dialog;
     private GoogleMap mMap;
@@ -41,7 +37,6 @@ public class PostoLocationsTask extends AsyncTask<String, Void, LocalResult> {
     private LocationManager locationManagerAsync;
     double   latAsync=0.0;
     double lonAsync=0.0;
-    String thikanaAsync="Scan sms for location";
 
     String AddressAsync="";
     Geocoder GeocoderAsync;
@@ -57,7 +52,7 @@ public class PostoLocationsTask extends AsyncTask<String, Void, LocalResult> {
     private static String ERRO = "erro";
 
 
-    public PostoLocationsTask(Context context, OnPostExecuteListener onPostExecuteListener, double lat, double lng) {
+    public FastFoodLocationsTask(Context context, OnPostExecuteListener onPostExecuteListener, double lat, double lng) {
         this.context = context;
         this.lat = lat;
         this.lng = lng;
@@ -81,10 +76,11 @@ public class PostoLocationsTask extends AsyncTask<String, Void, LocalResult> {
     @Override
     protected LocalResult doInBackground(String... params) {
 
-        String url = "http://ec2-54-153-109-26.us-west-1.compute.amazonaws.com?lat="+lat+"&lng="+lng;
+        String url = "http://ec2-54-153-109-26.us-west-1.compute.amazonaws.com/fastfood.php?lat="+lat+"&lng="+lng;
 
+        System.out.println(url);
         LocalResult localResult = new LocalResult();
-        List<Posto> postosList = new ArrayList<Posto>();
+        List<FastFood> fastFoodList = new ArrayList<FastFood>();
 
         InputStream is = null;
         try {
@@ -92,14 +88,14 @@ public class PostoLocationsTask extends AsyncTask<String, Void, LocalResult> {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
             Gson gson = new Gson();
-            Type listType = new TypeToken<ArrayList<Posto>>() {}.getType();
-            postosList = gson.fromJson(jsonText,listType);
+            Type listType = new TypeToken<ArrayList<FastFood>>() {}.getType();
+            fastFoodList = gson.fromJson(jsonText,listType);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        localResult.setOnPostFlag(LocalResult.POSTO);
-        localResult.setPostos(postosList);
+        localResult.setOnPostFlag(LocalResult.FAST_FOOD);
+        localResult.setFastFoods(fastFoodList);
 
         return localResult;
     }
@@ -125,3 +121,4 @@ public class PostoLocationsTask extends AsyncTask<String, Void, LocalResult> {
         return sb.toString();
     }
 }
+

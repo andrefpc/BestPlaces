@@ -10,6 +10,7 @@ public class LocalResult {
     public static int ESTACIONAMENTO = 4;
     public static int RESTAURANTE = 5;
     public static int HOSPITAL = 6;
+    public static int FAST_FOOD = 7;
 
     private int onPostFlag;
     private MyLocal myLocal;
@@ -18,11 +19,12 @@ public class LocalResult {
     private List<Estacionamento> estacionamentos;
     private List<Restaurante> restaurantes;
     private List<Hospital> hospitais;
+    private List<FastFood> fastFoods;
 
     public LocalResult() {
     }
 
-    public LocalResult(int onPostFlag, MyLocal myLocal, List<Posto> postos, List<Bar> bares, List<Estacionamento> estacionamentos, List<Restaurante> restaurantes, List<Hospital> hospitais) {
+    public LocalResult(int onPostFlag, MyLocal myLocal, List<Posto> postos, List<Bar> bares, List<Estacionamento> estacionamentos, List<Restaurante> restaurantes, List<Hospital> hospitais, List<FastFood> fastFoods) {
         this.onPostFlag = onPostFlag;
         this.myLocal = myLocal;
         this.postos = postos;
@@ -30,6 +32,7 @@ public class LocalResult {
         this.estacionamentos = estacionamentos;
         this.restaurantes = restaurantes;
         this.hospitais = hospitais;
+        this.fastFoods = fastFoods;
     }
 
     public int getOnPostFlag() {
@@ -88,4 +91,11 @@ public class LocalResult {
         this.hospitais = hospitais;
     }
 
+    public List<FastFood> getFastFoods() {
+        return fastFoods;
+    }
+
+    public void setFastFoods(List<FastFood> fastFoods) {
+        this.fastFoods = fastFoods;
+    }
 }

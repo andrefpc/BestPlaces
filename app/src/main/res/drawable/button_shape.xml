@@ -6,14 +6,8 @@
     <solid
         android:color="#009688"
         />
-    <padding
-        android:left="10dp"
-        android:top="5dp"
-        android:right="10dp"
-        android:bottom="5dp"
-        />
-    <stroke
-        android:width="3dp"
-        android:color="#FFFFFF"
+    <size
+        android:width="270dp"
+        android:height="60dp"
         />
 </shape>
