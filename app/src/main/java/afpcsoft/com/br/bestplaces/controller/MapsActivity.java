@@ -1,45 +1,48 @@
 package afpcsoft.com.br.bestplaces.controller;
 
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Outline;
+import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationManager;
-import android.media.Image;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Display;
+import android.view.DragEvent;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewOutlineProvider;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.RotateAnimation;
+import android.widget.ActionMenuView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import afpcsoft.com.br.bestplaces.dao.UserDAO;
 import afpcsoft.com.br.bestplaces.Enums.BandeiraPostoEnum;
 import afpcsoft.com.br.bestplaces.Enums.FastFoodTypeEnum;
 import afpcsoft.com.br.bestplaces.R;
@@ -69,8 +72,11 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
     private Button goToInfoWindow;
     private String urlInfoWindow;
     private ViewGroup viewGroup;
-    private ImageButton refresh;
+
     private RotateAnimation rotation;
+    private Animation shake;
+
+    Map<View, LinearLayout> viewMap;
 
     private Map<Integer, Posto> postoMap;
     private Map<Integer, Bar> barMap;
@@ -86,12 +92,31 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
     private static String BAR = "Bar";
     private static String HOSPITAL = "Hospital";
 
+    private LinearLayout grid1;
+    private LinearLayout grid2;
+    private LinearLayout grid3;
+    private LinearLayout grid4;
+    private LayoutInflater inflater;
+
+    private View search;
+    private View refresh;
+    private View zoomIn;
+    private View zoomOut;
+    private View myLocal;
+
+
     CameraPosition cameraPosition;
+
+
+    private int x_cord;
+    private int y_cord;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
 
         postoMap =  new HashMap<Integer, Posto>();
         barMap =  new HashMap<Integer, Bar>();
@@ -99,15 +124,42 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
         restauranteMap =  new HashMap<Integer, Restaurante>();
         hospitalMap =  new HashMap<Integer, Hospital>();
         fastFoodMap =  new HashMap<Integer, FastFood>();
-
         rotation= new RotateAnimation(0f,360f, Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
         rotation.setDuration(600);
+
+       viewMap = new HashMap<View, LinearLayout>();
+
+        shake = AnimationUtils.loadAnimation(MapsActivity.this, R.anim.shake);
 
         myLocationMarker = new MarkerOptions();
         myLocationMarker.title("You are here");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user));
 
-        ImageButton zoomIn = (ImageButton) findViewById(R.id.plusBtn);
+        generateLayouts();
+        setUpMapIfNeeded();
+        initialize();
+        leftMenu();
+        rightMenu();
+
+
+    }
+
+    private void generateLayouts() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int width = (70 * metrics.densityDpi) / DisplayMetrics.DENSITY_DEFAULT;
+        int heigh = (70 * metrics.densityDpi) / DisplayMetrics.DENSITY_DEFAULT;
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width,heigh);
+
+        grid1 = (LinearLayout) findViewById(R.id.grid1);
+        grid2 = (LinearLayout) findViewById(R.id.grid2);
+        grid3 = (LinearLayout) findViewById(R.id.grid3);
+        grid4 = (LinearLayout) findViewById(R.id.grid4);
+
+        zoomIn = new ImageButton(MapsActivity.this);
+        zoomIn.setLayoutParams(layoutParams);
+        zoomIn.setPadding(10, 10, 10, 10);
+        zoomIn.setBackgroundResource(R.drawable.plus);
         zoomIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,7 +176,10 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
                 }
             }
         });
-        ImageButton zoomOut = (ImageButton) findViewById(R.id.minusBtn);
+        zoomOut = new ImageButton(MapsActivity.this);
+        zoomOut.setLayoutParams(layoutParams);
+        zoomOut.setPadding(10, 10, 10, 10);
+        zoomOut.setBackgroundResource(R.drawable.minus);
         zoomOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,7 +197,10 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
             }
         });
 
-        ImageButton myLocal = (ImageButton) findViewById(R.id.myLocationBtn);
+        myLocal = new ImageButton(MapsActivity.this);
+        myLocal.setLayoutParams(layoutParams);
+        myLocal.setPadding(10, 10, 10, 10);
+        myLocal.setBackgroundResource(R.drawable.location);
         myLocal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -164,7 +222,10 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
             }
         });
 
-        refresh = (ImageButton) findViewById(R.id.refreshBtn);
+        refresh = new ImageButton(MapsActivity.this);
+        refresh.setLayoutParams(layoutParams);
+        refresh.setPadding(10, 10, 10, 10);
+        refresh.setBackgroundResource(R.drawable.refresh);
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -176,21 +237,51 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
             }
         });
 
-        ImageButton search = (ImageButton) findViewById(R.id.searchBtn);
+        search = new ImageButton(MapsActivity.this);
+        search.setLayoutParams(layoutParams);
+        search.setPadding(10, 10, 10, 10);
+        search.setBackgroundResource(R.drawable.search);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MapsActivity.this, SearchActivity.class);
+//                v.startAnimation(shake);
+//                Intent intent = new Intent(MapsActivity.this, SearchActivity.class);
+//                startActivity(intent);
+                Intent intent = new Intent(MapsActivity.this, ButtonConfigurattionActivity.class);
                 startActivity(intent);
             }
         });
 
-        setUpMapIfNeeded();
-        initialize();
-        leftMenu();
-        rightMenu();
+//        search.setOnTouchListener(new MyTouchListener());
+//        refresh.setOnTouchListener(new MyTouchListener());
+//        myLocal.setOnTouchListener(new MyTouchListener());
+//        zoomIn.setOnTouchListener(new MyTouchListener());
+//        zoomOut.setOnTouchListener(new MyTouchListener());
 
+        if (grid1.getChildCount() > 0) {
+            grid1.removeViews(0, grid1.getChildCount());
+        }
+        if (grid2.getChildCount() > 0) {
+            grid2.removeViews(0, grid2.getChildCount());
+        }
+        if (grid3.getChildCount() > 0) {
+            grid3.removeViews(0, grid3.getChildCount());
+        }
+        if (grid4.getChildCount() > 0) {
+            grid4.removeViews(0, grid4.getChildCount());
+        }
 
+        viewMap.put(search,grid1);
+        viewMap.put(refresh,grid2);
+        viewMap.put(myLocal,grid3);
+        viewMap.put(zoomIn,grid4);
+        viewMap.put(zoomOut,grid4);
+
+        grid1.addView(search);
+        grid2.addView(refresh);
+        grid3.addView(myLocal);
+        grid4.addView(zoomIn);
+        grid4.addView(zoomOut);
     }
 
     @Override
@@ -254,7 +345,7 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
             MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
                 @Override
                 public void gotLocation(Location location){
-                    mMap.clear();
+//                    mMap.clear();
                     MyLocal myLocal = new MyLocal();
                     myLocal.setLocation(location);
                     generateMyLocalMarker(myLocal);
@@ -518,9 +609,9 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
                 TextView descricaoTextView = (TextView) findViewById(R.id.textDescriptionRight);
                 TextView endCompTextView = (TextView) findViewById(R.id.textEnderecoRight);
                 TextView phoneTextView = (TextView) findViewById(R.id.textPhoneLeft);
-                if(marker.getTitle().equals(POSTO)){
+                if (marker.getTitle().equals(POSTO)) {
                     try {
-                        int id  = Integer.valueOf(marker.getSnippet());
+                        int id = Integer.valueOf(marker.getSnippet());
                         Posto chosen = postoMap.get(id);
 
                         nomeTextView.setText(chosen.getNome());
@@ -528,12 +619,12 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
                         descricaoTextView.setText(BandeiraPostoEnum.getNomeById(chosen.getBandeira_id()));
                         endCompTextView.setText(chosen.getEndComp());
                         phoneTextView.setText(chosen.getTel());
-                    }catch (Exception e){
+                    } catch (Exception e) {
 
                     }
-                }else if(marker.getTitle().equals(ESTACIONAMENTO)){
+                } else if (marker.getTitle().equals(ESTACIONAMENTO)) {
                     try {
-                        int id  = Integer.valueOf(marker.getSnippet());
+                        int id = Integer.valueOf(marker.getSnippet());
                         Estacionamento chosen = estacionamentoMap.get(id);
 
                         nomeTextView.setText(chosen.getNome());
@@ -541,12 +632,12 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
                         descricaoTextView.setText(marker.getTitle());
                         endCompTextView.setText(chosen.getEndComp());
                         phoneTextView.setText(chosen.getTel());
-                    }catch (Exception e){
+                    } catch (Exception e) {
 
                     }
-                }else if(marker.getTitle().equals(FAST_FOOD)){
+                } else if (marker.getTitle().equals(FAST_FOOD)) {
                     try {
-                        int id  = Integer.valueOf(marker.getSnippet());
+                        int id = Integer.valueOf(marker.getSnippet());
                         FastFood chosen = fastFoodMap.get(id);
 
                         nomeTextView.setText(chosen.getNome());
@@ -554,12 +645,12 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
 //                        descricaoTextView.setText(chosen.getDescricao());
                         endCompTextView.setText(chosen.getEndComp());
                         phoneTextView.setText(chosen.getTel());
-                    }catch (Exception e){
+                    } catch (Exception e) {
 
                     }
-                }else if(marker.getTitle().equals(BAR)){
+                } else if (marker.getTitle().equals(BAR)) {
                     try {
-                        int id  = Integer.valueOf(marker.getSnippet());
+                        int id = Integer.valueOf(marker.getSnippet());
                         Bar chosen = barMap.get(id);
 
 //                        nomeTextView.setText(chosen.getNome());
@@ -567,12 +658,12 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
                         descricaoTextView.setText(marker.getTitle());
 //                        endCompTextView.setText(chosen.getEndComp());
 //                        phoneTextView.setText(chosen.getTel());
-                    }catch (Exception e){
+                    } catch (Exception e) {
 
                     }
-                }else if(marker.getTitle().equals(RESTAURANTE)){
+                } else if (marker.getTitle().equals(RESTAURANTE)) {
                     try {
-                        int id  = Integer.valueOf(marker.getSnippet());
+                        int id = Integer.valueOf(marker.getSnippet());
                         Restaurante chosen = restauranteMap.get(id);
 
 //                        nomeTextView.setText(chosen.getNome());
@@ -580,12 +671,12 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
                         descricaoTextView.setText(marker.getTitle());
 //                        endCompTextView.setText(chosen.getEndComp());
 //                        phoneTextView.setText(chosen.getTel());
-                    }catch (Exception e){
+                    } catch (Exception e) {
 
                     }
-                }else if(marker.getTitle().equals(HOSPITAL)){
+                } else if (marker.getTitle().equals(HOSPITAL)) {
                     try {
-                        int id  = Integer.valueOf(marker.getSnippet());
+                        int id = Integer.valueOf(marker.getSnippet());
                         Hospital chosen = hospitalMap.get(id);
 
 //                        nomeTextView.setText(chosen.getNome());
@@ -593,7 +684,7 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
                         descricaoTextView.setText(marker.getTitle());
 //                        endCompTextView.setText(chosen.getEndComp());
 //                        phoneTextView.setText(chosen.getTel());
-                    }catch (Exception e){
+                    } catch (Exception e) {
 
                     }
                 }
@@ -660,5 +751,112 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
                 }
 //            }
 //        }
+    }
+
+    private final class MyTouchListener implements View.OnTouchListener {
+
+        public boolean onTouch(View v, MotionEvent me) {
+            if (me.getAction() == MotionEvent.ACTION_MOVE) {
+                Log.d("dragAndDrop", "ACTION_MOVE event");
+
+                x_cord = (int) me.getRawX() - v.getWidth() / 2;
+                y_cord = (int) (me.getRawY() - v.getHeight() * 1.5);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(v.getWidth(), v.getHeight());
+                layoutParams.setMargins((int) me.getRawX() - v.getWidth() / 2, (int) (me.getRawY() - v.getHeight() * 1.5), (int) me.getRawX() - v.getWidth() / 2, (int) (me.getRawY() - v.getHeight() * 1.5));
+                v.setLayoutParams(layoutParams);
+                v.setAlpha(0.5f);
+
+            }else if (me.getAction() == MotionEvent.ACTION_UP) {
+                Log.d("dragAndDrop", "ACTION_UP event");
+
+                Display display = getWindowManager().getDefaultDisplay();
+                Point size = new Point();
+                display.getSize(size);
+                int width = size.x;
+                int height = size.y;
+
+                LinearLayout lastLayout = viewMap.get(v);
+                viewMap.remove(v);
+                lastLayout.removeView(v);
+
+
+
+                if (grid3.getChildCount() > 0) {
+                    grid3.removeViews(0, grid3.getChildCount());
+                }
+                if (grid4.getChildCount() > 0) {
+                    grid4.removeViews(0, grid4.getChildCount());
+                }
+
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(v.getWidth(), v.getHeight());
+                if(x_cord < width/2 && y_cord < height/2){
+                    layoutParams.gravity = Gravity.START|Gravity.TOP;
+                    v.setLayoutParams(layoutParams);
+                    if (grid1.getChildCount() > 0) {
+                        grid1.removeViews(0, grid1.getChildCount());
+                    }
+                    for(Map.Entry entry : viewMap.entrySet()){
+                        LinearLayout linearLayout = (LinearLayout) entry.getValue();
+                        if(linearLayout.equals(grid1)) {
+                            View view = (View) entry.getKey();
+                            grid1.addView(view);
+                        }
+                    }
+                    grid1.addView(v);
+                    viewMap.put(v, grid1);
+                }else if(x_cord > width/2 && y_cord < height/2){
+                    layoutParams.gravity = Gravity.END|Gravity.TOP;
+                    v.setLayoutParams(layoutParams);
+                    if (grid2.getChildCount() > 0) {
+                        grid2.removeViews(0, grid2.getChildCount());
+                    }
+                    for(Map.Entry entry : viewMap.entrySet()){
+                        LinearLayout linearLayout = (LinearLayout) entry.getValue();
+                        if(linearLayout.equals(grid2)) {
+                            View view = (View) entry.getKey();
+                            grid2.addView(view);
+                        }
+                    }
+                    grid2.addView(v);
+                    viewMap.put(v,grid2);
+                }   else if(x_cord < width/2 && y_cord > height/2) {
+                    layoutParams.gravity = Gravity.START|Gravity.BOTTOM;
+                    v.setLayoutParams(layoutParams);
+                    if (grid3.getChildCount() > 0) {
+                        grid3.removeViews(0, grid3.getChildCount());
+                    }
+                    for(Map.Entry entry : viewMap.entrySet()){
+                        LinearLayout linearLayout = (LinearLayout) entry.getValue();
+                        if(linearLayout.equals(grid3)) {
+                            View view = (View) entry.getKey();
+                            grid3.addView(view);
+                        }
+                    }
+                    grid3.addView(v);
+                    viewMap.put(v,grid2);
+                }else if(x_cord > width/2 && y_cord > height/2){
+                    layoutParams.gravity = Gravity.END|Gravity.BOTTOM;
+                    v.setLayoutParams(layoutParams);
+                    if (grid4.getChildCount() > 0) {
+                        grid4.removeViews(0, grid4.getChildCount());
+                    }
+                    for(Map.Entry entry : viewMap.entrySet()){
+                        LinearLayout linearLayout = (LinearLayout) entry.getValue();
+                        if(linearLayout.equals(grid4)) {
+                            View view = (View) entry.getKey();
+                            grid4.addView(view);
+                        }
+                    }
+                    grid4.addView(v);
+                    viewMap.put(v,grid2);
+                }
+
+                v.setAlpha(1.0f);
+            }
+
+//                return true;
+
+            return false;
+        }
     }
 }
