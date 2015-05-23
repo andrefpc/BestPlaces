@@ -4,9 +4,25 @@
     <string name="title_activity_base">BaseActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
     <string name="title_activity_street_view">StreetView</string>
     <string name="title_activity_search_view">Search</string>
     <string name="title_activity_registration">Registration</string>
     <string name="title_activity_chose_preferences">ChosePreferences</string>
     <string name="title_activity_no_connection">NoConnection</string>
+    <string name="title_activity_place_picker">PlacePickerActivity</string>
+    <string name="title_activity_infos">Informações</string>
+
+    <string name="add_prices">Adicionar Item</string>
+
+    <string name="title_section1">Geral</string>
+    <string name="title_section2">Preços</string>
+    <string name="title_activity_maps_backup">MapsBackupActivity</string>
+    <string name="title_activity_expanded_image">ExpandedImageActivity</string>
+    <string name="title_activity_add_price">AddPriceActivity</string>
+
+    <string name="add_price_name_title">Título</string>
+    <string name="add_price_description_title">Descrição</string>
+    <string name="add_price_price_title">Preço</string>
+    <string name="btn_salvar">Salvar</string>
 </resources>

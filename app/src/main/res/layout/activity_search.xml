@@ -50,12 +50,12 @@
             <!--android:layout_height="wrap_content"-->
             <!--android:layout_gravity="center_vertical"-->
             <!--android:src="@drawable/refresh"/>-->
-            <ImageView
-                android:id="@+id/more"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/ic_action_navigation_more_vert"/>
+            <!--<ImageView-->
+                <!--android:id="@+id/more"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:src="@drawable/ic_action_navigation_more_vert"/>-->
         </LinearLayout>
     </LinearLayout>
     <android.support.v4.widget.DrawerLayout
@@ -205,10 +205,10 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@drawable/local_gray"/>
+                            <!--<ImageView-->
+                                <!--android:layout_width="20dp"-->
+                                <!--android:layout_height="20dp"-->
+                                <!--android:src="@drawable/local_gray"/>-->
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -242,10 +242,10 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@drawable/phone_gray"/>
+                            <!--<ImageView-->
+                                <!--android:layout_width="20dp"-->
+                                <!--android:layout_height="20dp"-->
+                                <!--android:src="@drawable/phone_gray"/>-->
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -335,10 +335,10 @@
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content">
-                                <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:src="@drawable/local_gray"/>
+                                <!--<ImageView-->
+                                    <!--android:layout_width="20dp"-->
+                                    <!--android:layout_height="20dp"-->
+                                    <!--android:src="@drawable/local_gray"/>-->
                             </LinearLayout>
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -372,10 +372,10 @@
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content">
-                                <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:src="@drawable/phone_gray"/>
+                                <!--<ImageView-->
+                                    <!--android:layout_width="20dp"-->
+                                    <!--android:layout_height="20dp"-->
+                                    <!--android:src="@drawable/phone_gray"/>-->
                             </LinearLayout>
                             <LinearLayout
                                 android:layout_width="wrap_content"

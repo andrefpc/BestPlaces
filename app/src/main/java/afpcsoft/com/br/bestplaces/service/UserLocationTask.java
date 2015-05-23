@@ -1,38 +1,18 @@
 package afpcsoft.com.br.bestplaces.service;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
-import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.text.Html;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.List;
-import java.util.Locale;
-
-import afpcsoft.com.br.bestplaces.R;
 import afpcsoft.com.br.bestplaces.model.LocalResult;
 import afpcsoft.com.br.bestplaces.model.MyLocal;
-import afpcsoft.com.br.bestplaces.service.GPSTracker;
 
 public class UserLocationTask extends AsyncTask<String, Void, LocalResult> {
 

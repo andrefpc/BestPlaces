@@ -2,8 +2,6 @@ package afpcsoft.com.br.bestplaces.model;
 
 import android.location.Location;
 
-import java.util.List;
-
 public class MyLocal {
     private String nome;
     private String logradouro;

@@ -1,7 +1,5 @@
 package afpcsoft.com.br.bestplaces.Utils;
 
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-
 import afpcsoft.com.br.bestplaces.R;
 
 /**

@@ -3,13 +3,11 @@ package afpcsoft.com.br.bestplaces.service;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.location.Address;
-import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.text.Html;
+import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -26,7 +24,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import afpcsoft.com.br.bestplaces.model.LocalResult;
 import afpcsoft.com.br.bestplaces.model.Posto;
@@ -82,6 +79,7 @@ public class PostoLocationsTask extends AsyncTask<String, Void, LocalResult> {
     protected LocalResult doInBackground(String... params) {
 
         String url = "http://ec2-54-153-109-26.us-west-1.compute.amazonaws.com?lat="+lat+"&lng="+lng;
+//        String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+lat+","+lng+"&radius=500&types=food&key=AIzaSyBxyXNj5Pm-ArbAk_0LzIgZfWovgLUPLUM";
 
         LocalResult localResult = new LocalResult();
         List<Posto> postosList = new ArrayList<Posto>();
@@ -91,6 +89,7 @@ public class PostoLocationsTask extends AsyncTask<String, Void, LocalResult> {
             is = new URL(url).openStream();
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
+            Log.i("TESTE_JSON", jsonText);
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<Posto>>() {}.getType();
             postosList = gson.fromJson(jsonText,listType);

@@ -23,7 +23,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import afpcsoft.com.br.bestplaces.model.Estacionamento;
 import afpcsoft.com.br.bestplaces.model.FastFood;
 import afpcsoft.com.br.bestplaces.model.LocalResult;
 

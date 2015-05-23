@@ -129,8 +129,8 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
                 new PostoLocationsTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude).execute();
-                new EstacionamentoLocationsTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude).execute();
-                new FastFoodLocationsTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude).execute();
+//                new EstacionamentoLocationsTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude).execute();
+//                new FastFoodLocationsTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude).execute();
 
             }
         });
@@ -404,8 +404,8 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
                 viewGroup = (ViewGroup) getLayoutInflater().inflate(R.layout.info_window_layout, null);
                 LinearLayout layoutInfoWindow = (LinearLayout) viewGroup.findViewById(R.id.layoutInfoWindow);
                 TextView nameInfoWindow = (TextView) viewGroup.findViewById(R.id.name);
-                TextView localInfoWindow = (TextView) viewGroup.findViewById(R.id.local);
-                TextView phoneInfoWindow = (TextView) viewGroup.findViewById(R.id.phone);
+//                TextView localInfoWindow = (TextView) viewGroup.findViewById(R.id.local);
+//                TextView phoneInfoWindow = (TextView) viewGroup.findViewById(R.id.phone);
                 if(marker.getTitle().equals(POSTO)){
                     try {
                         layoutInfoWindow.setBackgroundColor((Color.parseColor("#000096")));
@@ -414,8 +414,8 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
                         Posto chosen = postoMap.get(id);
 
                         nameInfoWindow.setText(chosen.getNome());
-                        localInfoWindow.setText(chosen.getEndComp());
-                        phoneInfoWindow.setText(chosen.getTel());
+//                        localInfoWindow.setText(chosen.getEndComp());
+//                        phoneInfoWindow.setText(chosen.getTel());
                     }catch (Exception e){
 
                     }
@@ -427,8 +427,8 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
                         Estacionamento chosen = estacionamentoMap.get(id);
 
                         nameInfoWindow.setText(chosen.getNome());
-                        localInfoWindow.setText(chosen.getEndComp());
-                        phoneInfoWindow.setText(chosen.getTel());
+//                        localInfoWindow.setText(chosen.getEndComp());
+//                        phoneInfoWindow.setText(chosen.getTel());
                     }catch (Exception e){
 
                     }
@@ -440,8 +440,8 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
                         FastFood chosen = fastFoodMap.get(id);
 
                         nameInfoWindow.setText(chosen.getNome());
-                        localInfoWindow.setText(chosen.getEndComp());
-                        phoneInfoWindow.setText(chosen.getTel());
+//                        localInfoWindow.setText(chosen.getEndComp());
+//                        phoneInfoWindow.setText(chosen.getTel());
                     }catch (Exception e){
 
                     }

@@ -1,7 +1,7 @@
 package afpcsoft.com.br.bestplaces.controller;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 
 import afpcsoft.com.br.bestplaces.R;
 
