@@ -39,14 +39,16 @@ public class DetailsApiTask extends AsyncTask<String, Void, DetailsApiResult> {
     private TextView url;
     private ImageView imageView;
     private ProgressBar progressBar;
+    private Context context;
 
-    public DetailsApiTask(String placeId, TextView phone, TextView address, TextView url, ImageView imageView, ProgressBar progressBar ) {
+    public DetailsApiTask(String placeId, TextView phone, TextView address, TextView url, ImageView imageView, ProgressBar progressBar, Context context ) {
         this.placeId = placeId;
         this.phone = phone;
         this.address = address;
         this.url = url;
         this.imageView = imageView;
         this.progressBar = progressBar;
+        this.context = context;
     }
 
     @Override
@@ -94,23 +96,27 @@ public class DetailsApiTask extends AsyncTask<String, Void, DetailsApiResult> {
         if(phoneText != null) {
             phone.setText(phoneText);
         }else{
-            phone.setText("Número de telefone indisponível");
+            phone.setText(context.getString(R.string.numero_telefone_indisponivel));
         }
         if(addressText != null){
             address.setText(addressText);
         }else{
-            address.setText("Endereço indisponível");
+            address.setText(context.getString(R.string.endereco_indisponivel));
         }
 
         if(urlText != null){
             url.setText(detailsApiResult.getResult().getUrl());
             Linkify.addLinks(url, Linkify.ALL);
         }else{
-            url.setText("Perfil online indisponível");
+            url.setText(context.getString(R.string.perfil_online_indisponivel));
         }
 
         if(photos != null) {
-            new DownloadImageTask(imageView, progressBar, photos.get(0).getPhotoReference()).execute();
+            String urldisplay = "https://maps.googleapis.com/maps/api/place/photo";
+            urldisplay += "?maxwidth=400";
+            urldisplay += "&photoreference="+photos.get(0).getPhotoReference();
+            urldisplay += "&key=AIzaSyBxyXNj5Pm-ArbAk_0LzIgZfWovgLUPLUM";
+            new DownloadImageTask(imageView, progressBar, urldisplay).execute();
         }else{
             progressBar.setVisibility(View.GONE);
             imageView.setVisibility(View.VISIBLE);

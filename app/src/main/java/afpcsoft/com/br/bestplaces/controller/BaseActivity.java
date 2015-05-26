@@ -1,19 +1,28 @@
 package afpcsoft.com.br.bestplaces.controller;
 
 import android.app.ActionBar;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.ViewDragHelper;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.widget.Button;
 import android.widget.LinearLayout;
+
+import com.facebook.login.LoginManager;
+import com.facebook.login.widget.LoginButton;
 
 import java.lang.reflect.Field;
 
@@ -28,64 +37,38 @@ public class BaseActivity extends ActionBarActivity {
     protected DrawerLayout drawerLayoutRight;
     protected LinearLayout drawerRight;
     protected boolean openDrawableRight;
-//    protected ActionBarDrawerToggle drawerToggle;
+
+    protected ActionBarDrawerToggle drawerToggle;
 //    protected ImageView menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         getOverflowMenu();
         leftMenu();
         rightMenu();
 
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_infos, menu);
+        getMenuInflater().inflate(R.menu.menu_base, menu);
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-//        if (drawerToggle.onOptionsItemSelected(item)) {
-//            return true;
-//        }
-
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }else if(id == R.id.action_search){
-            Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
-            startActivity(intent);
-        }else if(id == R.id.action_filter){
-            if(drawerLayoutRight.isDrawerOpen(drawerRight)) {
-                drawerLayoutRight.closeDrawer(drawerRight);
-            }else{
-                drawerLayoutRight.openDrawer(drawerRight);
-            }
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-//        drawerToggle.syncState();
+//        mDrawerToggle.syncState();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-//        drawerToggle.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     public void initialize(){
@@ -138,35 +121,48 @@ public class BaseActivity extends ActionBarActivity {
         }
     }
 
-    @Override
-    public boolean onKeyDown(int keycode, KeyEvent e) {
-        switch(keycode) {
-            case KeyEvent.KEYCODE_MENU:
-                if(drawerLayoutLeft.isDrawerOpen(drawerLeft)){
-                    drawerLayoutLeft.closeDrawer(drawerLeft);
-                    openDrawableLeft = false;
-                }else{
-                    drawerLayoutRight.closeDrawer(drawerRight);
-                    drawerLayoutLeft.openDrawer(drawerLeft);
-                    openDrawableLeft = true;
-                }
-        }
-
-        return super.onKeyDown(keycode, e);
-    }
-
     protected void leftMenu() {
         try {
             drawerLayoutLeft = (DrawerLayout) findViewById(R.id.drawer_layout_left);
             drawerLeft = (LinearLayout) findViewById(R.id.drawer_left);
 
-//            drawerToggle = new ActionBarDrawerToggle(BaseActivity.this, drawerLayoutLeft,
-//                    R.drawable.ic_action_navigation_menu, 0, 0) ;
-            
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-            getActionBar().setHomeButtonEnabled(true);
+            drawerToggle = new ActionBarDrawerToggle((Activity) this, drawerLayoutLeft,
+                    R.drawable.ic_drawer, 0, 0){
+                public void onDrawerClosed(View view) {
+                    supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                }
 
-//            drawerLayoutLeft.setDrawerListener(drawerToggle);
+                public void onDrawerOpened(View drawerView) {
+                    supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+//                    drawerLayoutRight.closeDrawer(drawerRight);
+                }
+            };
+
+            drawerLayoutLeft.setDrawerListener(new DrawerLayout.DrawerListener() {
+                @Override
+                public void onDrawerSlide(View view, float v) {
+
+                }
+
+                @Override
+                public void onDrawerOpened(View view) {
+//                    drawerLayoutRight.closeDrawer(drawerRight);
+                }
+
+                @Override
+                public void onDrawerClosed(View view) {
+                }
+
+                @Override
+                public void onDrawerStateChanged(int i) {
+                }
+            });
+
+            getSupportActionBar().setHomeButtonEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+            drawerLayoutLeft.setDrawerListener(drawerToggle);
 
             Field dragger = null;
 
@@ -248,7 +244,6 @@ public class BaseActivity extends ActionBarActivity {
 
                 @Override
                 public void onDrawerStateChanged(int i) {
-
                 }
             });
 

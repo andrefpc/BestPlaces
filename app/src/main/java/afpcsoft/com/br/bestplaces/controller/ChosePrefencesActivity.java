@@ -11,6 +11,7 @@ public class ChosePrefencesActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chose_preferences);
+
     }
 
 

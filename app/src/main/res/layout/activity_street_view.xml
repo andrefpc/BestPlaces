@@ -4,76 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <LinearLayout
-        android:id="@+id/menu_bar"
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#303F9F"
-        android:layout_gravity="center_vertical"
-        android:orientation="horizontal">
-        <LinearLayout
-            android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/streetviewpanorama"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingLeft="10dp"
-            android:layout_weight="1">
-            <ImageView
-                android:id="@+id/menu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/ic_action_navigation_menu"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingLeft="30dp"
-                android:layout_gravity="center_vertical"
-                android:textColor="@android:color/white"
-                android:textSize="15sp"
-                android:text="Best Places"/>
-        </LinearLayout>
-        <!--<ImageView-->
-            <!--android:id="@+id/more"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="0"-->
-            <!--android:layout_gravity="center_vertical"-->
-            <!--android:src="@drawable/ic_action_navigation_more_vert"/>-->
+            class="com.google.android.gms.maps.SupportStreetViewPanoramaFragment" />
     </LinearLayout>
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/drawer_layout_left"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
 
-            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/streetviewpanorama"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                class="com.google.android.gms.maps.SupportStreetViewPanoramaFragment" />
-        </LinearLayout>
-
-        <!-- The navigation drawerLeft -->
-        <LinearLayout
-            android:id="@+id/drawer_left"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:gravity="start"
-            android:background="#ffffff"
-            android:orientation="vertical" >
-
-            <fragment
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:name="com.google.android.gms.maps.SupportMapFragment" >
-            </fragment>
-        </LinearLayout>
-    </android.support.v4.widget.DrawerLayout>
 </LinearLayout>
 
 

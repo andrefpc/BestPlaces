@@ -1,13 +1,16 @@
 <resources>
-    <string name="app_name">BestPlaces</string>
+    <string name="app_name">Best Places</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="title_activity_base">BaseActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
+    <string name="action_filter">Filtro</string>
+    <string name="action_add">Adcionar</string>
+
     <string name="title_activity_street_view">StreetView</string>
-    <string name="title_activity_search_view">Search</string>
-    <string name="title_activity_registration">Registration</string>
+    <string name="title_activity_search_view">Busca por Região</string>
+    <string name="title_activity_registration">Login</string>
     <string name="title_activity_chose_preferences">ChosePreferences</string>
     <string name="title_activity_no_connection">NoConnection</string>
     <string name="title_activity_place_picker">PlacePickerActivity</string>
@@ -21,8 +24,42 @@
     <string name="title_activity_expanded_image">ExpandedImageActivity</string>
     <string name="title_activity_add_price">AddPriceActivity</string>
 
+
+    <string name="add_place_name_title">Nome</string>
+    <string name="add_place_description_title">Descrição</string>
+    <string name="add_place_phone_title">Telefone</string>
+    <string name="add_place_site_title">Site</string>
+    <string name="add_place_social_network_title">Rede Social</string>
+    <string name="add_place_type_title">Tipo</string>
+    <string name="add_place_foto_title">Foto</string>
+
     <string name="add_price_name_title">Título</string>
     <string name="add_price_description_title">Descrição</string>
     <string name="add_price_price_title">Preço</string>
     <string name="btn_salvar">Salvar</string>
+    <string name="title_activity_face_book_login">Best Places</string>
+
+    <string name="logout_facebook">Logout</string>
+
+    <string name="facebook_app_id">1628828117403628</string>
+    <string name="title_activity_add_place">AddPlaceActivity</string>
+
+
+    <string name="numero_telefone_indisponivel">Número de telefone indisponível</string>
+    <string name="endereco_indisponivel">Endereço indisponível</string>
+    <string name="perfil_online_indisponivel">Perfil online indisponível</string>
+
+
+    <string name="dialog_title_logout">Deseja deslogar da sua conta?</string>
+    <string name="dialog_title_gps">Seu GPS está desligado, ative caso queira a localização real, caso não queira, você pode marcar sua própria localização.</string>
+    <string name="dialog_title_streeview">Deseja ver o Street View do local pressionado?</string>
+    <string name="dialog_title_finish">Deseja sair da aplicação?</string>
+
+
+    <string name="dialog_sim">Sim</string>
+    <string name="dialog_nao">Não</string>
+    <string name="dialog_ok">Ok</string>
+    <string name="dialog_colocar_localizacao">Colocar localiação</string>
+    <string name="dialog_ativar_gps">Ativar GPS</string>
+
 </resources>

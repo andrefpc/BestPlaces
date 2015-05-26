@@ -1,13 +1,16 @@
 package afpcsoft.com.br.bestplaces.controller;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import java.io.InputStream;
+import android.net.Uri;
 
 /**
  * Created by AndréFelipe on 17/05/2015.
@@ -15,13 +18,23 @@ import java.io.InputStream;
 public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
     ImageView bmImage;
     ProgressBar progressBar;
-    String imageReference;
+    String url;
+    Uri uri;
+    Context context;
 
-    public DownloadImageTask(ImageView bmImage, ProgressBar progressBar, String imageReference) {
+    public DownloadImageTask(ImageView bmImage, ProgressBar progressBar, String url) {
         this.bmImage = bmImage;
         this.progressBar = progressBar;
-        this.imageReference = imageReference;
+        this.url = url;
     }
+
+    public DownloadImageTask(ImageView bmImage, ProgressBar progressBar, Uri uri, Context context) {
+        this.bmImage = bmImage;
+        this.progressBar = progressBar;
+        this.uri = uri;
+        this.context = context;
+    }
+
 
 
     @Override
@@ -33,20 +46,19 @@ public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
 
     @Override
     protected Bitmap doInBackground(String... urls) {
-        String urldisplay = "https://maps.googleapis.com/maps/api/place/photo";
-        urldisplay += "?maxwidth=400";
-        urldisplay += "&photoreference="+imageReference;
-        urldisplay += "&key=AIzaSyBxyXNj5Pm-ArbAk_0LzIgZfWovgLUPLUM";
 
-
-        Bitmap mIcon11 = null;
+        Bitmap bitmap = null;
         try {
-            InputStream in = new java.net.URL(urldisplay).openStream();
-            mIcon11 = BitmapFactory.decodeStream(in);
+            if(uri == null) {
+                InputStream in = new java.net.URL(url).openStream();
+                bitmap = BitmapFactory.decodeStream(in);
+            }else{
+                bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return mIcon11;
+        return bitmap;
     }
 
     @Override

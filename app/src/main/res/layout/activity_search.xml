@@ -4,60 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <LinearLayout
-        android:id="@+id/menu_bar"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#303F9F"
-        android:layout_gravity="center_vertical"
-        android:orientation="horizontal">
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:paddingLeft="10dp"
-            android:layout_weight="1">
-            <ImageView
-                android:id="@+id/menu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/ic_action_navigation_menu"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingLeft="30dp"
-                android:layout_gravity="center_vertical"
-                android:textColor="@android:color/white"
-                android:textSize="15sp"
-                android:text="Best Places"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:gravity="center_vertical"
-            android:layout_weight="0">
-            <!--<ImageView-->
-            <!--android:id="@+id/myLocal"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_vertical"-->
-            <!--android:src="@drawable/mylocation"/>-->
-            <!--<ImageView-->
-            <!--android:id="@+id/refresh"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_vertical"-->
-            <!--android:src="@drawable/refresh"/>-->
-            <!--<ImageView-->
-                <!--android:id="@+id/more"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="center_vertical"-->
-                <!--android:src="@drawable/ic_action_navigation_more_vert"/>-->
-        </LinearLayout>
-    </LinearLayout>
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout_right"
         android:layout_width="match_parent"
@@ -84,26 +30,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:paddingBottom="20dp"
-                        android:paddingLeft="10dp"
                         android:layout_gravity="left|bottom">
 
                         <ImageButton
-                            android:id="@+id/searchBtn"
+                            android:id="@+id/refresh"
                             android:layout_width="70dp"
                             android:layout_height="70dp"
-                            android:background="@drawable/search"/>
-
-                        <ImageButton
-                            android:id="@+id/refreshBtn"
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
+                            android:padding="10dp"
                             android:background="@drawable/refresh"/>
-
                         <ImageButton
-                            android:id="@+id/myLocationBtn"
+                            android:id="@+id/location"
                             android:layout_width="70dp"
                             android:layout_height="70dp"
+                            android:padding="10dp"
                             android:background="@drawable/location"/>
                     </LinearLayout>
 
@@ -111,18 +50,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:paddingBottom="90dp"
-                        android:paddingRight="10dp"
                         android:layout_gravity="right|bottom">
                         <ImageButton
-                            android:id="@+id/plusBtn"
+                            android:id="@+id/zoomIn"
                             android:layout_width="70dp"
                             android:layout_height="70dp"
+                            android:padding="10dp"
                             android:background="@drawable/plus"/>
+
                         <ImageButton
-                            android:id="@+id/minusBtn"
+                            android:id="@+id/zoomOut"
                             android:layout_width="70dp"
                             android:layout_height="70dp"
+                            android:padding="10dp"
                             android:background="@drawable/minus"/>
                     </LinearLayout>
 
@@ -162,117 +102,91 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="start"
                 android:gravity="start"
-                android:background="#ffffff"
+                android:background="@color/material_blue_grey_800"
                 android:orientation="vertical" >
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@color/material_blue_grey_950"
                     android:orientation="vertical">
+
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="120dp"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="center_vertical"
-                        android:background="#3F51B5"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center_horizontal"
+                        android:paddingTop="10dp"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:id="@+id/profileImage"
+                            android:layout_width="150dp"
+                            android:layout_height="150dp"
+                            android:visibility="gone"
+                            />
+                        <ProgressBar
+                            android:id="@+id/loading"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
                         android:orientation="vertical">
                         <TextView
-                            android:id="@+id/textNomeLeft"
-                            android:layout_width="wrap_content"
+                            android:id="@+id/profileName"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="André Felipe de Paiva Cardozo"
-                            android:paddingLeft="30dp"
+                            android:paddingLeft="10dp"
                             android:textSize="25sp"
                             android:textColor="#ffffff"/>
                         <TextView
                             android:id="@+id/textDescriptionLeft"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
                             android:text="Último Login: 22/03/2015"
-                            android:paddingLeft="30dp"
+                            android:paddingLeft="10dp"
                             android:textSize="15sp"
                             android:textColor="#C5CAE9"/>
+
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="center_vertical"
-                        android:padding="10dp"
-                        android:orientation="horizontal">
+                        android:gravity="center"
+                        android:paddingBottom="10dp"
+                        android:orientation="vertical">
+
                         <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                            <!--<ImageView-->
-                                <!--android:layout_width="20dp"-->
-                                <!--android:layout_height="20dp"-->
-                                <!--android:src="@drawable/local_gray"/>-->
-                        </LinearLayout>
-                        <LinearLayout
+                            android:id="@+id/logout_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:paddingLeft="20dp">
+                            android:background="@drawable/logout_button">
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:src="@drawable/com_facebook_button_icon"
+                                android:paddingLeft="20dp"/>
                             <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:text="Endereço"
-                                android:textColor="#727272"/>
-                            <TextView
-                                android:id="@+id/textEnderecoLeft"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:text="Rua Victor Brechert, 182, Santissimo, Rio de Janeiro, RJ"
-                                android:textColor="#B6B6B6"/>
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/white"
+                                android:layout_gravity="center"
+                                android:paddingLeft="45dp"
+                                android:text="@string/logout_facebook" />
                         </LinearLayout>
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="#B6B6B6"/>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="center_vertical"
-                        android:padding="10dp"
-                        android:orientation="horizontal">
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                            <!--<ImageView-->
-                                <!--android:layout_width="20dp"-->
-                                <!--android:layout_height="20dp"-->
-                                <!--android:src="@drawable/phone_gray"/>-->
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:paddingLeft="20dp">
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:text="Telefone"
-                                android:textColor="#727272"/>
-                            <TextView
-                                android:id="@+id/textPhone"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:text="(21) 3335-4099"
-                                android:textColor="#B6B6B6"/>
-                        </LinearLayout>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#B6B6B6"/>
-                    <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/edit_text_shape"/>
                 </LinearLayout>
             </LinearLayout>
 
@@ -284,181 +198,119 @@
             android:layout_height="match_parent"
             android:layout_gravity="end"
             android:gravity="end"
-            android:background="#ffffff"
+            android:background="@color/material_blue_grey_800"
             android:orientation="vertical" >
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:paddingTop="10dp"
                 android:orientation="vertical">
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="170dp"
-                    android:layout_gravity="center_vertical"
-                    android:gravity="center_vertical"
-                    android:background="#3F51B5"
-                    android:orientation="vertical">
-                    <TextView
-                        android:id="@+id/textNomeRight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="30dp"
-                        android:textSize="20sp"
-                        android:textColor="#ffffff"/>
-                    <TextView
-                        android:id="@+id/textDescriptionRight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="5dp"
-                        android:paddingLeft="30dp"
-                        android:textSize="15sp"
-                        android:textColor="#C5CAE9"/>
-                    <RatingBar
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"/>
-                </LinearLayout>
-                <ScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:gravity="center_vertical"
-                            android:padding="10dp"
-                            android:orientation="horizontal">
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content">
-                                <!--<ImageView-->
-                                    <!--android:layout_width="20dp"-->
-                                    <!--android:layout_height="20dp"-->
-                                    <!--android:src="@drawable/local_gray"/>-->
-                            </LinearLayout>
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingLeft="20dp">
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:text="Endereço"
-                                    android:textColor="#727272"/>
-                                <TextView
-                                    android:id="@+id/textEnderecoRight"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:text="Rua Victor Brechert, 182, Santissimo, Rio de Janeiro, RJ"
-                                    android:textColor="#B6B6B6"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#B6B6B6"/>
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:gravity="center_vertical"
-                            android:padding="10dp"
-                            android:orientation="horizontal">
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content">
-                                <!--<ImageView-->
-                                    <!--android:layout_width="20dp"-->
-                                    <!--android:layout_height="20dp"-->
-                                    <!--android:src="@drawable/phone_gray"/>-->
-                            </LinearLayout>
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingLeft="20dp">
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:text="Telefone"
-                                    android:textColor="#727272"/>
-                                <TextView
-                                    android:id="@+id/textPhoneLeft"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:textColor="#B6B6B6"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                    </LinearLayout>
-                </ScrollView>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#B6B6B6"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:orientation="horizontal">
-                <ImageView
-                    android:id="@+id/imagePrices"
-                    android:layout_width="wrap_content"
-                    android:layout_height="60dp"
-                    android:layout_gravity="center"
+                    android:layout_height="wrap_content"
                     android:padding="10dp"
-                    android:src="@drawable/money"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#B6B6B6"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:orientation="horizontal">
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:gravity="center">
-                    <ImageView
-                        android:id="@+id/imageStreetView"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_gravity="center"
-                        android:padding="5dp"
-                        android:src="@drawable/street_view"/>
+                    android:orientation="horizontal">
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.2"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/parking"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="20dp"
+                            android:text="Estacionamento"
+                            android:textColor="@android:color/white"
+                            android:textSize="20sp"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.8">
+                        <Switch
+                            android:id="@+id/swichParking"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right"/>
+                    </LinearLayout>
                 </LinearLayout>
+
                 <LinearLayout
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="#B6B6B6"/>
-                <LinearLayout
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:gravity="center">
-                    <ImageView
-                        android:id="@+id/imageNavigation"
-                        android:layout_gravity="center"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:padding="5dp"
-                        android:src="@drawable/navigation"/>
+                    android:padding="10dp"
+                    android:orientation="horizontal">
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.2"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/restaurant"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="20dp"
+                            android:text="Restaurante"
+                            android:textColor="@android:color/white"
+                            android:textSize="20sp"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.8">
+                        <Switch
+                            android:id="@+id/swichRestaurant"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:orientation="horizontal">
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.2"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/gas_station"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="20dp"
+                            android:text="Posto"
+                            android:textColor="@android:color/white"
+                            android:textSize="20sp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.8">
+                        <Switch
+                            android:id="@+id/swichGasStation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </android.support.v4.widget.DrawerLayout>
 </LinearLayout>
+

@@ -66,6 +66,8 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
     private NumberPicker np1;
     private NumberPicker np2;
     private NumberPicker np3;
+    private NumberPicker np4;
+    private NumberPicker np5;
     private EditText title;
     private EditText desciption;
 
@@ -96,6 +98,17 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
         np3.setMinValue(0);
         np3.setMaxValue(9);
         np3.setWrapSelectorWheel(true);
+
+        np4 = (NumberPicker) findViewById(R.id.numberPicker4);
+        np4.setMinValue(0);
+        np4.setMaxValue(9);
+        np4.setWrapSelectorWheel(true);
+
+
+        np5 = (NumberPicker) findViewById(R.id.numberPicker5);
+        np5.setMinValue(0);
+        np5.setMaxValue(9);
+        np5.setWrapSelectorWheel(true);
 
         title = (EditText) findViewById(R.id.titleEditText);
         desciption = (EditText) findViewById(R.id.descriptionEditText);
@@ -141,7 +154,7 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
         ItemPrices itemPrices = new ItemPrices();
         itemPrices.setItem(title.getText().toString());
         itemPrices.setDescription(desciption.getText().toString());
-        itemPrices.setPrice("R$ "+ np1.getValue() + "," + np2.getValue() + np3.getValue());
+        itemPrices.setPrice("R$ "+ np1.getValue() + np2.getValue() + np3.getValue() + "," + np4.getValue() + np5.getValue());
         return itemPrices;
     }
 
@@ -531,7 +544,7 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
                         startActivity(intent);
                     }
                 });
-                new DetailsApiTask(resultPlaces.getPlaceId(), textViewPhone, textViewAddress, textViewUrl, imageView, loading).execute();
+                new DetailsApiTask(resultPlaces.getPlaceId(), textViewPhone, textViewAddress, textViewUrl, imageView, loading, getActivity()).execute();
 
             }else{
             }

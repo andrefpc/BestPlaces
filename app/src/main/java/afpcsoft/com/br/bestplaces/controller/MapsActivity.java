@@ -5,21 +5,29 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.RotateAnimation;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.facebook.Profile;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -29,10 +37,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import afpcsoft.com.br.bestplaces.R;
+import afpcsoft.com.br.bestplaces.Utils.DialogUtils;
 import afpcsoft.com.br.bestplaces.model.MyLocal;
 import afpcsoft.com.br.bestplaces.model.placesApi.PlacesApiResult;
 import afpcsoft.com.br.bestplaces.model.placesApi.ResultPlaces;
@@ -75,13 +85,44 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
 
     private SharedPreferences sharedPreferences;
     private static String FILTER_PREFERENCES = "filterPreferences";
+    private Profile profile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        sharedPreferences = getSharedPreferences(FILTER_PREFERENCES, Context.MODE_PRIVATE);
+        LinearLayout button = (LinearLayout) findViewById(R.id.logout_button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogUtils.showLogoutAlertToUser(MapsActivity.this);
+            }
+        });
+
+        Intent intent = getIntent();
+        profile = intent.getParcelableExtra("profile");
+
+        Log.d("profile", profile.getName());
+
+        TextView profileName = (TextView) findViewById(R.id.profileName);
+        ImageView profileImage = (ImageView) findViewById(R.id.profileImage);
+        ProgressBar loading = (ProgressBar) findViewById(R.id.loading);
+
+        if(profile != null) {
+            Bitmap bitmap = null;
+            profileName.setText(profile.getName());
+            Uri imageUri  = profile.getProfilePictureUri(150, 150);
+            Log.i("profile", imageUri.getPath());
+            if (imageUri != null) {
+                new DownloadImageTask(profileImage, loading, imageUri.toString()).execute();
+            } else {
+                loading.setVisibility(View.GONE);
+                profileImage.setVisibility(View.VISIBLE);
+                profileImage.setImageResource(R.drawable.com_facebook_profile_picture_blank_portrait);
+            }
+        }
+
 
         resultPlacesMap = new HashMap<String, ResultPlaces>();
 
@@ -94,6 +135,51 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
 
         myLocationMarker = new MarkerOptions();
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user));
+
+        generateFilter();
+        generateLayouts();
+        setUpMapIfNeeded();
+        initialize();
+        leftMenu();
+        rightMenu();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            drawerLayoutRight.closeDrawer(drawerRight);
+            return true;
+        }
+
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }else if(id == R.id.action_search){
+            Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
+            intent.putExtra("profile", profile);
+            startActivity(intent);
+        }else if(id == R.id.action_filter){
+            if(drawerLayoutRight.isDrawerOpen(drawerRight)) {
+                drawerLayoutRight.closeDrawer(drawerRight);
+            }else{
+                drawerLayoutRight.openDrawer(drawerRight);
+                drawerLayoutLeft.closeDrawer(drawerLeft);
+            }
+        }else if(id == R.id.action_add){
+            Intent intent = new Intent(getApplicationContext(), AddPlaceActivity.class);
+            startActivity(intent);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void generateFilter() {
+        sharedPreferences = getSharedPreferences(FILTER_PREFERENCES, Context.MODE_PRIVATE);
 
         boolean restaurantSwinch = sharedPreferences.getBoolean(RESTAURANT, true);
         boolean parkingSwinch = sharedPreferences.getBoolean(PARKING, true);
@@ -194,12 +280,6 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
                 editor.commit();
             }
         });
-
-        generateLayouts();
-        setUpMapIfNeeded();
-        initialize();
-        leftMenu();
-        rightMenu();
     }
 
     @Override
@@ -278,6 +358,8 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
                 rotation.setRepeatCount(RotateAnimation.INFINITE);
                 refresh.startAnimation(rotation);
 
+                mMap.clear();
+
                 getUserLocation();
             }
         });
@@ -324,10 +406,7 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                Intent intent = new Intent(MapsActivity.this, StreetViewActivity.class);
-                intent.putExtra("lat", latLng.latitude);
-                intent.putExtra("lng", latLng.longitude);
-                startActivity(intent);
+                DialogUtils.showStreetViewAlertToUser(latLng, MapsActivity.this);
             }
         });
 
@@ -359,36 +438,11 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
             myLocation.getLocation(this, locationResult);
 
         }else{
-            showGPSDisabledAlertToUser();
+            DialogUtils.showGPSDisabledAlertToUser(MapsActivity.this);
         }
     }
 
-    private void showGPSDisabledAlertToUser(){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setCancelable(false);
-        alertDialogBuilder.setMessage("Seu GPS está desligado, ative caso queira a localização real, caso não queira, você pode marcar sua própria localização.")
-                .setCancelable(false)
-                .setPositiveButton("Ativar GPS",
-                        new DialogInterface.OnClickListener(){
-                            public void onClick(DialogInterface dialog, int id){
-                                Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                startActivityForResult(callGPSSettingIntent, 0);
-                            }
-                        });
-        alertDialogBuilder.setNegativeButton("Colocar localiação",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-//                        Intent intent = new Intent(MapsActivity.this, SearchActivity.class);
-//                        startActivity(intent);
-//                        Intent intent = new Intent(MapsActivity.this, InfosActivity.class);
-//                        startActivity(intent);
-                        finish();
-                        dialog.cancel();
-                    }
-                });
-        AlertDialog alert = alertDialogBuilder.create();
-        alert.show();
-    }
+
 
 
     private void generateMyLocalMarker(MyLocal myLocal) {
@@ -515,6 +569,18 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
         }
         if(switchGasStation.isChecked() && placesApiResult != null && placesApiResult.getType().equals(GAS_STATION)){
             GenerateMarkersPlacesAPI(placesApiResult);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if(drawerLayoutLeft.isDrawerOpen(drawerLeft)){
+            drawerLayoutLeft.closeDrawer(drawerLeft);
+        }else if(drawerLayoutRight.isDrawerOpen(drawerRight)){
+            drawerLayoutRight.closeDrawer(drawerRight);
+        }else{
+            DialogUtils.showFinishAlertToUser(MapsActivity.this);
         }
     }
 
