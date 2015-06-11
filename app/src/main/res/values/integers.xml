@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item format="integer" name="item11" type="integer">11</item>
+    <item format="integer" name="item12" type="integer">12</item>
+    <item format="integer" name="item13" type="integer">13</item>
+    <item format="integer" name="item14" type="integer">14</item>
+    <item format="integer" name="item15" type="integer">15</item>
+    <item format="integer" name="item16" type="integer">16</item>
+    <item format="integer" name="item17" type="integer">17</item>
+    <item format="integer" name="item18" type="integer">18</item>
+
+    <item format="integer" name="item21" type="integer">21</item>
+    <item format="integer" name="item22" type="integer">22</item>
+    <item format="integer" name="item23" type="integer">23</item>
+    <item format="integer" name="item24" type="integer">24</item>
+    <item format="integer" name="item25" type="integer">25</item>
+    <item format="integer" name="item26" type="integer">26</item>
+    <item format="integer" name="item27" type="integer">27</item>
+    <item format="integer" name="item28" type="integer">28</item>
+
+    <item format="integer" name="item31" type="integer">31</item>
+    <item format="integer" name="item32" type="integer">32</item>
+    <item format="integer" name="item33" type="integer">33</item>
+    <item format="integer" name="item34" type="integer">34</item>
+    <item format="integer" name="item35" type="integer">35</item>
+    <item format="integer" name="item36" type="integer">36</item>
+    <item format="integer" name="item37" type="integer">37</item>
+    <item format="integer" name="item38" type="integer">38</item>
+
+    <item format="integer" name="item41" type="integer">41</item>
+    <item format="integer" name="item42" type="integer">42</item>
+    <item format="integer" name="item43" type="integer">43</item>
+    <item format="integer" name="item44" type="integer">44</item>
+    <item format="integer" name="item45" type="integer">45</item>
+    <item format="integer" name="item46" type="integer">46</item>
+    <item format="integer" name="item47" type="integer">47</item>
+    <item format="integer" name="item48" type="integer">48</item>
+
+    <item format="integer" name="search" type="integer">1</item>
+    <item format="integer" name="refresh" type="integer">2</item>
+    <item format="integer" name="myLocal" type="integer">3</item>
+    <item format="integer" name="zoomIn" type="integer">4</item>
+    <item format="integer" name="zoomOut" type="integer">5</item>
+    <item format="integer" name="settings" type="integer">6</item>
+</resources>
