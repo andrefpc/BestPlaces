@@ -24,16 +24,20 @@ public class ResultDetails {
     @SerializedName("url")
     private String url;
 
+    @SerializedName("website")
+    private String website;
+
     public ResultDetails() {
     }
 
-    public ResultDetails(String formattedAddress, String formattedPhoneNumber, OpeningHoursDetails openingHours, List<PhotoDetails> photos, String url) {
+    public ResultDetails(String formattedAddress, String formattedPhoneNumber, OpeningHoursDetails openingHours, List<PhotoDetails> photos, String url, String website) {
 
         this.formattedAddress = formattedAddress;
         this.formattedPhoneNumber = formattedPhoneNumber;
         this.openingHours = openingHours;
         this.photos = photos;
         this.url = url;
+        this.website = website;
     }
 
     public String getFormattedAddress() {
@@ -75,5 +79,13 @@ public class ResultDetails {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
     }
 }

@@ -36,19 +36,29 @@ public class DetailsApiTask extends AsyncTask<String, Void, DetailsApiResult> {
     private String placeId;
     private TextView phone;
     private TextView address;
-    private TextView url;
+    private TextView website;
     private ImageView imageView;
     private ProgressBar progressBar;
     private Context context;
 
-    public DetailsApiTask(String placeId, TextView phone, TextView address, TextView url, ImageView imageView, ProgressBar progressBar, Context context ) {
+    private OnPostExecuteListener onPostExecuteListener;
+
+    public DetailsApiTask(String placeId, TextView phone, TextView address, TextView website, ImageView imageView, ProgressBar progressBar, Context context, OnPostExecuteListener onPostExecuteListener ) {
         this.placeId = placeId;
         this.phone = phone;
         this.address = address;
-        this.url = url;
+        this.website = website;
         this.imageView = imageView;
         this.progressBar = progressBar;
         this.context = context;
+        this.onPostExecuteListener = onPostExecuteListener;
+        if (onPostExecuteListener == null) {
+            throw new IllegalArgumentException("Param cannot be null.");
+        }
+    }
+
+    public static interface OnPostExecuteListener{
+        void onPostExecute(DetailsApiResult detailsApiResult);
     }
 
     @Override
@@ -87,6 +97,13 @@ public class DetailsApiTask extends AsyncTask<String, Void, DetailsApiResult> {
     @Override
     protected void onPostExecute(DetailsApiResult detailsApiResult) {
         super.onPostExecute(detailsApiResult);
+        if (onPostExecuteListener != null){
+            try {
+                onPostExecuteListener.onPostExecute(detailsApiResult);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
 
         List<PhotoDetails> photos = detailsApiResult.getResult().getPhotos();
         String phoneText = detailsApiResult.getResult().getFormattedPhoneNumber();
@@ -95,8 +112,10 @@ public class DetailsApiTask extends AsyncTask<String, Void, DetailsApiResult> {
 
         if(phoneText != null) {
             phone.setText(phoneText);
+            Linkify.addLinks(phone, Linkify.PHONE_NUMBERS);
         }else{
             phone.setText(context.getString(R.string.numero_telefone_indisponivel));
+            phone.setVisibility(View.VISIBLE);
         }
         if(addressText != null){
             address.setText(addressText);
@@ -105,10 +124,11 @@ public class DetailsApiTask extends AsyncTask<String, Void, DetailsApiResult> {
         }
 
         if(urlText != null){
-            url.setText(detailsApiResult.getResult().getUrl());
-            Linkify.addLinks(url, Linkify.ALL);
+            website.setText(detailsApiResult.getResult().getWebsite());
+            Linkify.addLinks(website, Linkify.ALL);
         }else{
-            url.setText(context.getString(R.string.perfil_online_indisponivel));
+            website.setText(context.getString(R.string.site_indisponivel));
+            website.setVisibility(View.VISIBLE);
         }
 
         if(photos != null) {

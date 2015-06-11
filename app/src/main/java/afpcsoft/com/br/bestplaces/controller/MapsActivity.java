@@ -1,8 +1,6 @@
 package afpcsoft.com.br.bestplaces.controller;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -10,7 +8,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,7 +15,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.RotateAnimation;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -37,19 +33,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import afpcsoft.com.br.bestplaces.R;
 import afpcsoft.com.br.bestplaces.Utils.DialogUtils;
 import afpcsoft.com.br.bestplaces.model.MyLocal;
+import afpcsoft.com.br.bestplaces.model.Place;
 import afpcsoft.com.br.bestplaces.model.placesApi.PlacesApiResult;
 import afpcsoft.com.br.bestplaces.model.placesApi.ResultPlaces;
 import afpcsoft.com.br.bestplaces.service.MyLocation;
 import afpcsoft.com.br.bestplaces.service.PlacesApiTask;
 
-public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChangeListener, PlacesApiTask.OnPostExecuteListener {
+public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostExecuteListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private MarkerOptions myLocationMarker;
@@ -65,6 +61,8 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
 
     private RotateAnimation rotation;
     private Animation shake;
+
+    private Place place;
 
     Map<View, LinearLayout> viewMap;
 
@@ -134,6 +132,7 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
         shake = AnimationUtils.loadAnimation(MapsActivity.this, R.anim.shake);
 
         myLocationMarker = new MarkerOptions();
+        myLocationMarker.title("My local");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user));
 
         generateFilter();
@@ -157,7 +156,9 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if(id == android.R.id.home) {
+            drawerLayoutLeft.closeDrawer(drawerLeft);
+        }else if (id == R.id.action_settings) {
             return true;
         }else if(id == R.id.action_search){
             Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
@@ -172,6 +173,7 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
             }
         }else if(id == R.id.action_add){
             Intent intent = new Intent(getApplicationContext(), AddPlaceActivity.class);
+            intent.putExtra("place", place);
             startActivity(intent);
         }
 
@@ -369,6 +371,7 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+//        setTitle(R.string.app_name);
     }
 
     @Override
@@ -390,7 +393,7 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
 
-            mMap.setOnCameraChangeListener(this);
+//            mMap.setOnCameraChangeListener(this);
 
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
@@ -420,6 +423,7 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
 
             rotation.setRepeatCount(RotateAnimation.INFINITE);
             refresh.startAnimation(rotation);
+            setTitle(R.string.loading);
             MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
                 @Override
                 public void gotLocation(Location location){
@@ -432,13 +436,17 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
                     new PlacesApiTask(MapsActivity.this, MapsActivity.this,myLocal.getLocation().getLatitude(), myLocal.getLocation().getLongitude(), PARKING).execute();
                     new PlacesApiTask(MapsActivity.this, MapsActivity.this,myLocal.getLocation().getLatitude(), myLocal.getLocation().getLongitude(), GAS_STATION).execute();
 
+                    place = new Place(location.getLatitude(), location.getLongitude());
+
+                    MenuItem item = menu.findItem(R.id.action_add);
+                    item.setVisible(true);
                 }
             };
             MyLocation myLocation = new MyLocation();
             myLocation.getLocation(this, locationResult);
 
         }else{
-            DialogUtils.showGPSDisabledAlertToUser(MapsActivity.this);
+            DialogUtils.showGPSDisabledAlertToUser(MapsActivity.this, profile);
         }
     }
 
@@ -471,18 +479,18 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
             @Override
             public View getInfoWindow(final Marker marker) {
 
-                layoutGeral.setVisibility(View.GONE);
-
                 viewGroup = (ViewGroup) getLayoutInflater().inflate(R.layout.info_window_layout, null);
-                LinearLayout layoutInfoWindow = (LinearLayout) viewGroup.findViewById(R.id.layoutInfoWindow);
-                TextView nameInfoWindow = (TextView) viewGroup.findViewById(R.id.name);
-                TextView localInfoWindow = (TextView) viewGroup.findViewById(R.id.endereco);
 
-                nameInfoWindow.setText(marker.getTitle());
-                ResultPlaces resultPlaces = resultPlacesMap.get(marker.getSnippet());
-                localInfoWindow.setText(resultPlaces.getVicinity());
-
-                layoutInfoWindow.setBackgroundColor(getResources().getColor(R.color.material_blue_grey_800));
+                if(!marker.getTitle().equals("My local")) {
+                    layoutGeral.setVisibility(View.GONE);
+                    LinearLayout layoutInfoWindow = (LinearLayout) viewGroup.findViewById(R.id.layoutInfoWindow);
+                    TextView nameInfoWindow = (TextView) viewGroup.findViewById(R.id.name);
+                    TextView localInfoWindow = (TextView) viewGroup.findViewById(R.id.endereco);
+                    nameInfoWindow.setText(marker.getTitle());
+                    ResultPlaces resultPlaces = resultPlacesMap.get(marker.getSnippet());
+                    localInfoWindow.setText(resultPlaces.getVicinity());
+                    layoutInfoWindow.setBackgroundColor(getResources().getColor(R.color.material_blue_grey_800));
+                }
 
                 return viewGroup;
             }
@@ -506,18 +514,20 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
             @Override
             public void onInfoWindowClick(final Marker marker) {
 
-                Intent intent = new Intent(MapsActivity.this, InfosActivity.class);
-                ResultPlaces resultPlaces = resultPlacesMap.get(marker.getSnippet());
-                intent.putExtra("resultPlaces", resultPlaces);
-                startActivity(intent);
+                if(!marker.getTitle().equals("My local")) {
+                    Intent intent = new Intent(MapsActivity.this, InfosActivity.class);
+                    ResultPlaces resultPlaces = resultPlacesMap.get(marker.getSnippet());
+                    intent.putExtra("resultPlaces", resultPlaces);
+                    startActivity(intent);
+                }
             }
         });
     }
 
-    @Override
-    public void onCameraChange(CameraPosition position) {
-        // Get the center of the Map.
-    }
+//    @Override
+//    public void onCameraChange(CameraPosition position) {
+//        // Get the center of the Map.
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -531,6 +541,7 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
                     mMap.clear();
                     rotation.setRepeatCount(RotateAnimation.INFINITE);
                     refresh.startAnimation(rotation);
+                    setTitle(R.string.loading);
                     MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
                         @Override
                         public void gotLocation(Location location){
@@ -613,6 +624,7 @@ public class MapsActivity extends BaseActivity implements GoogleMap.OnCameraChan
 
             if(rotation.isInitialized()) {
                 rotation.cancel();
+                setTitle(R.string.app_name);
             }
         }
     }

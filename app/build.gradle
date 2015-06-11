@@ -27,8 +27,9 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.google.maps.android:android-maps-utils:0.3.4'
-    compile files('D:/Programação/Android Studio/workspaceAndroidStudio/BestPlaces/libs/gson-2.2.4.jar')
     compile 'com.google.android.gms:play-services:7.0.0'
     compile 'com.google.android.gms:play-services-wearable:7.0.0'
     compile 'com.facebook.android:facebook-android-sdk:4.1.0'
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile files('libs/commons-codec-1.10.jar')
 }

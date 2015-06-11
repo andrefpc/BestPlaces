@@ -8,6 +8,9 @@
     <string name="action_filter">Filtro</string>
     <string name="action_add">Adcionar</string>
 
+
+    <string name="loading">Carregando...</string>
+
     <string name="title_activity_street_view">StreetView</string>
     <string name="title_activity_search_view">Busca por Região</string>
     <string name="title_activity_registration">Login</string>
@@ -47,7 +50,7 @@
 
     <string name="numero_telefone_indisponivel">Número de telefone indisponível</string>
     <string name="endereco_indisponivel">Endereço indisponível</string>
-    <string name="perfil_online_indisponivel">Perfil online indisponível</string>
+    <string name="site_indisponivel">Website indisponível</string>
 
 
     <string name="dialog_title_logout">Deseja deslogar da sua conta?</string>
@@ -61,5 +64,23 @@
     <string name="dialog_ok">Ok</string>
     <string name="dialog_colocar_localizacao">Colocar localiação</string>
     <string name="dialog_ativar_gps">Ativar GPS</string>
+    <string name="title_activity_camera">CameraActivity</string>
+    <string name="title_activity_details_preview">DetailsPreviewActivity</string>
+
+
+    <string name="messageDialog">Enviando...</string>
+    <string name="errorSendData">Erro ao enviar dados.</string>
+
+    <string name="nameEmpty">Campo nome é obrigatório!</string>
+    <string name="typeEmpty">Campo tipo é obrigatório!</string>
+
+
+    <string name="phoneUnavaible">Telefone indisponível</string>
+    <string name="siteUnavaible">Site indisponível</string>
+    <string name="socialNetworkUnavaible">Rede Social indisponível</string>
+
+
+    <string name="addPhone">Adicionar telefone</string>
+    <string name="addSite">Adicionar site</string>
 
 </resources>

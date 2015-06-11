@@ -37,7 +37,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import afpcsoft.com.br.bestplaces.R;
+import afpcsoft.com.br.bestplaces.Utils.DialogUtils;
 import afpcsoft.com.br.bestplaces.model.ItemPrices;
+import afpcsoft.com.br.bestplaces.model.detailsPlacesApi.DetailsApiResult;
 import afpcsoft.com.br.bestplaces.model.placesApi.ResultPlaces;
 import afpcsoft.com.br.bestplaces.service.DetailsApiTask;
 
@@ -59,6 +61,15 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
     ViewPager mViewPager;
     ResultPlaces resultPlaces;
 
+    public static int ADD_PHONE = 1;
+    public static int ADD_SITE = 2;
+
+
+    protected DrawerLayout drawerLayoutLeft;
+    protected LinearLayout drawerLeft;
+    protected boolean openDrawableLeft;
+
+
     protected DrawerLayout drawerLayoutRight;
     protected LinearLayout drawerRight;
     protected boolean openDrawableRight;
@@ -71,6 +82,12 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
     private EditText title;
     private EditText desciption;
 
+    private LinearLayout layoutPhone;
+    private LinearLayout layoutSite;
+    private EditText phoneEditText;
+    private EditText siteEditText;
+    private Button saveData;
+
     public Button submit;
 
 
@@ -81,6 +98,7 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
 
         getOverflowMenu();
         rightMenu();
+        leftMenu();
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -112,6 +130,12 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
 
         title = (EditText) findViewById(R.id.titleEditText);
         desciption = (EditText) findViewById(R.id.descriptionEditText);
+
+        layoutPhone = (LinearLayout) findViewById(R.id.layoutPhone);
+        layoutSite = (LinearLayout) findViewById(R.id.layoutSite);
+        phoneEditText = (EditText) findViewById(R.id.phoneEditText);
+        siteEditText = (EditText) findViewById(R.id.siteEditText);
+        saveData = (Button) findViewById(R.id.saveData);
 
         Intent intent = getIntent();
         resultPlaces = (ResultPlaces) intent.getSerializableExtra("resultPlaces");
@@ -154,8 +178,22 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
         ItemPrices itemPrices = new ItemPrices();
         itemPrices.setItem(title.getText().toString());
         itemPrices.setDescription(desciption.getText().toString());
-        itemPrices.setPrice("R$ "+ np1.getValue() + np2.getValue() + np3.getValue() + "," + np4.getValue() + np5.getValue());
+        if(np1.getValue() > 0) {
+            itemPrices.setPrice("R$ " + np1.getValue() + np2.getValue() + np3.getValue() + "," + np4.getValue() + np5.getValue());
+        }else{
+            itemPrices.setPrice("R$ " + np2.getValue() + np3.getValue() + "," + np4.getValue() + np5.getValue());
+        }
         return itemPrices;
+    }
+
+    public void resetView(){
+        title.setText("");
+        desciption.setText("");
+        np1.setValue(0);
+        np2.setValue(0);
+        np3.setValue(0);
+        np4.setValue(0);
+        np5.setValue(0);
     }
 
 
@@ -198,13 +236,97 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
 
     @Override
     public void onBackPressed(){
-        super.onBackPressed();
 
         if(drawerLayoutRight.isDrawerOpen(drawerRight)){
             drawerLayoutRight.closeDrawer(drawerRight);
+        }else if(drawerLayoutLeft.isDrawerOpen(drawerLeft)){
+            drawerLayoutLeft.closeDrawer(drawerLeft);
         }else{
-            finish();
+            super.onBackPressed();
         }
+    }
+
+    protected void leftMenu() {
+        try {
+            drawerLayoutLeft = (DrawerLayout) findViewById(R.id.drawer_layout_left);
+            drawerLeft = (LinearLayout) findViewById(R.id.drawer_left);
+
+            drawerLayoutLeft.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+            drawerLayoutLeft.setDrawerListener(new DrawerLayout.DrawerListener() {
+                @Override
+                public void onDrawerSlide(View view, float v) {
+
+                }
+
+                @Override
+                public void onDrawerOpened(View view) {
+                    drawerLayoutLeft.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                }
+
+                @Override
+                public void onDrawerClosed(View view) {
+                    drawerLayoutLeft.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                }
+
+                @Override
+                public void onDrawerStateChanged(int i) {
+
+                }
+            });
+
+            Field dragger = null;
+
+            try {
+                dragger = drawerLayoutLeft.getClass().getDeclaredField("mRightDragger");
+            } catch (NoSuchFieldException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            dragger.setAccessible(true);
+            ViewDragHelper draggerObj = null;
+            try {
+                draggerObj = (ViewDragHelper) dragger.get(drawerLayoutLeft);
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            Field mEdgeSize = null;
+            try {
+                mEdgeSize = draggerObj.getClass().getDeclaredField("mEdgeSize");
+            } catch (NoSuchFieldException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            mEdgeSize.setAccessible(true);
+            int edge = 0;
+            try {
+                edge = mEdgeSize.getInt(draggerObj);
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            try {
+                mEdgeSize.setInt(draggerObj, edge);
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     protected void rightMenu() {
@@ -290,12 +412,27 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
 
     }
 
-    public void openDrawer(){
+    public void openRightDrawer(){
         drawerLayoutRight.openDrawer(drawerRight);
     }
 
-    public void closeDrawer(){
+    public void closeRightDrawer(){
         drawerLayoutRight.closeDrawer(drawerRight);
+    }
+
+    public void openLeftDrawer(int type){
+        drawerLayoutLeft.openDrawer(drawerLeft);
+        if(type == ADD_PHONE){
+            layoutPhone.setVisibility(View.VISIBLE);
+            layoutSite.setVisibility(View.GONE);
+        }else if(type == ADD_SITE){
+            layoutSite.setVisibility(View.VISIBLE);
+            layoutPhone.setVisibility(View.GONE);
+        }
+    }
+
+    public void closeLeftDrawer(){
+        drawerLayoutLeft.closeDrawer(drawerLeft);
     }
 
     @Override
@@ -312,6 +449,8 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
+
+
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -387,21 +526,6 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
 
             itemPricesList = new ArrayList<ItemPrices>();
 
-            itemPricesList.add(new ItemPrices("Item 1", "Descricao do item 1", "R$1,00"));
-            itemPricesList.add(new ItemPrices("Item 2", "Descricao do item 2", "R$2,00"));
-            itemPricesList.add(new ItemPrices("Item 3", "Descricao do item 3", "R$3,00"));
-            itemPricesList.add(new ItemPrices("Item 4", "Descricao do item 4", "R$4,00"));
-            itemPricesList.add(new ItemPrices("Item 5", "Descricao do item 5", "R$5,00"));
-            itemPricesList.add(new ItemPrices("Item 6", "Descricao do item 6", "R$6,00"));
-            itemPricesList.add(new ItemPrices("Item 7", "Descricao do item 7", "R$7,00"));
-            itemPricesList.add(new ItemPrices("Item 8", "Descricao do item 8", "R$8,00"));
-            itemPricesList.add(new ItemPrices("Item 9", "Descricao do item 9", "R$9,00"));
-            itemPricesList.add(new ItemPrices("Item 10", "Descricao do item 10", "R$10,00"));
-            itemPricesList.add(new ItemPrices("Item 11", "Descricao do item 11", "R$11,00"));
-            itemPricesList.add(new ItemPrices("Item 12", "Descricao do item 12", "R$12,00"));
-            itemPricesList.add(new ItemPrices("Item 13", "Descricao do item 13", "R$13,00"));
-            itemPricesList.add(new ItemPrices("Item 14", "Descricao do item 14", "R$14,00"));
-
             View rootView = inflater.inflate(R.layout.fragment_prices, container, false);
             final LinearLayout containerPrices = (LinearLayout) rootView.findViewById(R.id.containerPrices);
 
@@ -409,13 +533,13 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
             addItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    infosActivity.openDrawer();
+                    infosActivity.openRightDrawer();
                 }
             });
 
             generateList(inflater, containerPrices, itemPricesList);
 
-            Button button = (Button) infosActivity.findViewById(R.id.submit);
+            Button button = (Button) infosActivity.findViewById(R.id.savePlace);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -426,7 +550,8 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
                     generateList(inflater, containerPrices, newItemPricesList);
                     itemPricesList = newItemPricesList;
 
-                    infosActivity.closeDrawer();
+                    infosActivity.closeRightDrawer();
+                    infosActivity.resetView();
                 }
             });
 
@@ -446,18 +571,23 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
                 price.setText(itemPrices.getPrice());
 
                 containerPrices.addView(itemLista);
-
             }
         }
     }
 
-    public static class GeneralFragment extends Fragment {
+    public static class GeneralFragment extends Fragment implements DetailsApiTask.OnPostExecuteListener {
         /**
          * The fragment argument representing the section number for this
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static ResultPlaces resultPlaces;
+        private ImageView addPhone;
+        private ImageView addSite;
+        private ImageView facebookIcon;
+        private ImageView plusIcon;
+        private String plusUrl;
+        private String facebookUrl;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -479,12 +609,52 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
+            final InfosActivity infosActivity = ((InfosActivity) getActivity());
+
             final View rootView = inflater.inflate(R.layout.fragment_infos, container, false);
             TextView textViewName = (TextView) rootView.findViewById(R.id.name);
             TextView textViewPhone = (TextView) rootView.findViewById(R.id.phone);
             TextView textViewAddress = (TextView) rootView.findViewById(R.id.address);
-            TextView textViewUrl = (TextView) rootView.findViewById(R.id.url);
-            TextView textViewTags = (TextView) rootView.findViewById(R.id.tags);
+            TextView textViewUrl = (TextView) rootView.findViewById(R.id.site);
+            TextView textViewTags = (TextView) rootView.findViewById(R.id.type);
+
+            addPhone = (ImageView) rootView.findViewById(R.id.addPhone);
+            addSite = (ImageView) rootView.findViewById(R.id.addSite);
+
+            facebookIcon = (ImageView) rootView.findViewById(R.id.facebook_icon);
+            plusIcon = (ImageView) rootView.findViewById(R.id.plus_icon);
+
+            facebookIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(facebookUrl != null) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(facebookUrl)));
+                    }
+                }
+            });
+
+            plusIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(plusUrl != null) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(plusUrl)));
+                    }
+                }
+            });
+
+            addPhone.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    infosActivity.openLeftDrawer(ADD_PHONE);
+                }
+            });
+
+            addSite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    infosActivity.openLeftDrawer(ADD_SITE);
+                }
+            });
 
             ImageView imageView = (ImageView) rootView.findViewById(R.id.photo);
             imageView.setOnClickListener(new View.OnClickListener() {
@@ -544,12 +714,26 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
                         startActivity(intent);
                     }
                 });
-                new DetailsApiTask(resultPlaces.getPlaceId(), textViewPhone, textViewAddress, textViewUrl, imageView, loading, getActivity()).execute();
+                new DetailsApiTask(resultPlaces.getPlaceId(), textViewPhone, textViewAddress, textViewUrl, imageView, loading, getActivity(), this).execute();
 
             }else{
             }
 
             return rootView;
+        }
+
+        @Override
+        public void onPostExecute(DetailsApiResult detailsApiResult) {
+            if(detailsApiResult.getResult().getFormattedPhoneNumber() == null){
+                addPhone.setVisibility(View.VISIBLE);
+            }if(detailsApiResult.getResult().getUrl() == null){
+                plusIcon.setImageResource(R.drawable.plus_off);
+                addSite.setVisibility(View.VISIBLE);
+            }if(detailsApiResult.getResult().getUrl() != null){
+                plusIcon.setImageResource(R.drawable.plus_on);
+                plusUrl = detailsApiResult.getResult().getUrl();
+            }
+            facebookIcon.setImageResource(R.drawable.facebook_off);
         }
     }
 }

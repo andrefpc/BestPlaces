@@ -1,169 +1,273 @@
-<android.support.v4.widget.DrawerLayout
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout_right"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent" android:layout_height="match_parent"
-        tools:context="afpcsoft.com.br.bestplaces.controller.InfosActivity" />
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/drawer_right"
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout_right"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:gravity="end"
-        android:background="@color/material_blue_grey_800"
-        android:orientation="vertical" >
-        <ScrollView
+        android:layout_height="match_parent" >
+
+        <android.support.v4.widget.DrawerLayout
+            android:id="@+id/drawer_layout_left"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent" >
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical">
-                <LinearLayout
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/pager"
+                    android:layout_width="match_parent" android:layout_height="match_parent"
+                    tools:context="afpcsoft.com.br.bestplaces.controller.InfosActivity" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/drawer_right"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:gravity="end"
+                android:background="@color/material_blue_grey_800"
+                android:orientation="vertical" >
+                <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="10dp">
-                    <TextView
-                        android:text="@string/add_price_name_title"
-                        android:textSize="20sp"
-                        android:padding="10dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@android:color/white"/>
+                    android:layout_height="match_parent">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingRight="10dp"
-                        android:paddingLeft="10dp"
-                        android:background="@color/ripple_material_dark">
-
-                        <EditText
-                            android:id="@+id/titleEditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textColor="@android:color/white"/>
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="10dp">
-                    <TextView
-                        android:text="@string/add_price_description_title"
-                        android:textSize="20sp"
-                        android:padding="10dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@android:color/white"/>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingRight="10dp"
-                        android:paddingLeft="10dp"
-                        android:background="@color/ripple_material_dark">
-                        <EditText
-                            android:id="@+id/descriptionEditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textColor="@android:color/white"/>
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="10dp">
-                    <TextView
-                        android:text="@string/add_price_price_title"
-                        android:textSize="20sp"
-                        android:padding="10dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@android:color/white"/>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:orientation="vertical">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:background="@color/ripple_material_dark"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+                            <TextView
+                                android:text="@string/add_price_name_title"
+                                android:textSize="20sp"
+                                android:padding="10dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/white"/>
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingRight="10dp"
+                                android:paddingLeft="10dp"
+                                android:background="@color/ripple_material_dark">
+
+                                <EditText
+                                    android:id="@+id/titleEditText"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@android:color/white"/>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+                            <TextView
+                                android:text="@string/add_price_description_title"
+                                android:textSize="20sp"
+                                android:padding="10dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/white"/>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingRight="10dp"
+                                android:paddingLeft="10dp"
+                                android:background="@color/ripple_material_dark">
+                                <EditText
+                                    android:id="@+id/descriptionEditText"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@android:color/white"/>
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+                            <TextView
+                                android:text="@string/add_price_price_title"
+                                android:textSize="20sp"
+                                android:padding="10dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/white"/>
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:background="@color/ripple_material_dark"
+                                    android:gravity="center">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:padding="5dp"
+                                        android:textSize="20sp"
+                                        android:text="R$"/>
+                                    <NumberPicker
+                                        android:id="@+id/numberPicker1"
+                                        android:layout_width="30dp"
+                                        android:layout_height="120dp"
+                                        android:solidColor="@android:color/white"
+                                        android:layout_centerInParent="true"></NumberPicker>
+                                    <NumberPicker
+                                        android:id="@+id/numberPicker2"
+                                        android:layout_width="30dp"
+                                        android:layout_height="120dp"
+                                        android:solidColor="@android:color/white"
+                                        android:layout_centerInParent="true"></NumberPicker>
+                                    <NumberPicker
+                                        android:id="@+id/numberPicker3"
+                                        android:layout_width="30dp"
+                                        android:layout_height="120dp"
+                                        android:solidColor="@android:color/white"
+                                        android:layout_centerInParent="true"></NumberPicker>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="20sp"
+                                        android:padding="5dp"
+                                        android:text=","/>
+
+                                    <NumberPicker
+                                        android:id="@+id/numberPicker4"
+                                        android:layout_width="30dp"
+                                        android:layout_height="120dp"
+                                        android:solidColor="@android:color/white"
+                                        android:layout_centerInParent="true"></NumberPicker>
+
+                                    <NumberPicker
+                                        android:id="@+id/numberPicker5"
+                                        android:layout_width="30dp"
+                                        android:layout_height="120dp"
+                                        android:solidColor="@android:color/white"
+                                        android:layout_centerInParent="true"></NumberPicker>
+                                </LinearLayout>
+                            </LinearLayout>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="10dp"
                             android:gravity="center">
-                            <TextView
+                            <Button
+                                android:id="@+id/savePlace"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:padding="5dp"
-                                android:textSize="20sp"
-                                android:text="R$"/>
-                            <NumberPicker
-                                android:id="@+id/numberPicker1"
-                                android:layout_width="30dp"
-                                android:layout_height="120dp"
-                                android:solidColor="@android:color/white"
-                                android:layout_centerInParent="true"></NumberPicker>
-                            <NumberPicker
-                                android:id="@+id/numberPicker2"
-                                android:layout_width="30dp"
-                                android:layout_height="120dp"
-                                android:solidColor="@android:color/white"
-                                android:layout_centerInParent="true"></NumberPicker>
-                            <NumberPicker
-                                android:id="@+id/numberPicker3"
-                                android:layout_width="30dp"
-                                android:layout_height="120dp"
-                                android:solidColor="@android:color/white"
-                                android:layout_centerInParent="true"></NumberPicker>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="20sp"
-                                android:padding="5dp"
-                                android:text=","/>
-
-                            <NumberPicker
-                                android:id="@+id/numberPicker4"
-                                android:layout_width="30dp"
-                                android:layout_height="120dp"
-                                android:solidColor="@android:color/white"
-                                android:layout_centerInParent="true"></NumberPicker>
-
-                            <NumberPicker
-                                android:id="@+id/numberPicker5"
-                                android:layout_width="30dp"
-                                android:layout_height="120dp"
-                                android:solidColor="@android:color/white"
-                                android:layout_centerInParent="true"></NumberPicker>
+                                android:gravity="center"
+                                android:layout_margin="10dp"
+                                android:textColor="@android:color/white"
+                                android:background="@drawable/save_button_gray"
+                                android:text="@string/btn_salvar"/>
                         </LinearLayout>
                     </LinearLayout>
-                </LinearLayout>
+                </ScrollView>
+            </LinearLayout>
+        </android.support.v4.widget.DrawerLayout>
+        <LinearLayout
+            android:id="@+id/drawer_left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:background="@color/material_blue_grey_800"
+            android:orientation="vertical" >
+            <LinearLayout
+                android:id="@+id/layoutPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="10dp">
+                <TextView
+                    android:text="@string/addPhone"
+                    android:textSize="20sp"
+                    android:padding="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"/>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:gravity="center">
-                    <Button
-                        android:id="@+id/submit"
-                        android:layout_width="wrap_content"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:background="@color/ripple_material_dark">
+                    <EditText
+                        android:id="@+id/phoneEditText"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:layout_margin="10dp"
-                        android:textColor="@android:color/white"
-                        android:background="@drawable/save_button_gray"
-                        android:text="@string/btn_salvar"/>
+                        android:textColor="@android:color/white"/>
                 </LinearLayout>
+
             </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
-</android.support.v4.widget.DrawerLayout>
+            <LinearLayout
+                android:id="@+id/layoutSite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="10dp">
+                <TextView
+                    android:text="@string/addSite"
+                    android:textSize="20sp"
+                    android:padding="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone"
+                    android:textColor="@android:color/white"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:background="@color/ripple_material_dark">
+                    <EditText
+                        android:id="@+id/siteEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textUri"
+                        android:textColor="@android:color/white"/>
+                </LinearLayout>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:gravity="center">
+                <Button
+                    android:id="@+id/saveData"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_margin="10dp"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/save_button_gray"
+                    android:text="@string/btn_salvar"/>
+            </LinearLayout>
+        </LinearLayout>
+    </android.support.v4.widget.DrawerLayout>
+</LinearLayout>

@@ -1,21 +1,16 @@
 package afpcsoft.com.br.bestplaces.controller;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -23,7 +18,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -38,30 +32,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import afpcsoft.com.br.bestplaces.Enums.BandeiraPostoEnum;
-import afpcsoft.com.br.bestplaces.Enums.FastFoodTypeEnum;
 import afpcsoft.com.br.bestplaces.R;
 import afpcsoft.com.br.bestplaces.Utils.DialogUtils;
-import afpcsoft.com.br.bestplaces.Utils.FastFoodUtils;
-import afpcsoft.com.br.bestplaces.Utils.PostoUtils;
-import afpcsoft.com.br.bestplaces.model.Bar;
-import afpcsoft.com.br.bestplaces.model.Estacionamento;
-import afpcsoft.com.br.bestplaces.model.FastFood;
-import afpcsoft.com.br.bestplaces.model.Hospital;
-import afpcsoft.com.br.bestplaces.model.LocalResult;
-import afpcsoft.com.br.bestplaces.model.MyLocal;
-import afpcsoft.com.br.bestplaces.model.Posto;
-import afpcsoft.com.br.bestplaces.model.Restaurante;
 import afpcsoft.com.br.bestplaces.model.placesApi.PlacesApiResult;
 import afpcsoft.com.br.bestplaces.model.placesApi.ResultPlaces;
-import afpcsoft.com.br.bestplaces.service.EstacionamentoLocationsTask;
-import afpcsoft.com.br.bestplaces.service.FastFoodLocationsTask;
 import afpcsoft.com.br.bestplaces.service.PlacesApiTask;
-import afpcsoft.com.br.bestplaces.service.PostoLocationsTask;
-import afpcsoft.com.br.bestplaces.service.UserLocationTask;
 
 /**
  * Created by AndréFelipe on 17/04/2015.
@@ -383,6 +360,7 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
 
                 rotation.setRepeatCount(RotateAnimation.INFINITE);
                 refresh.startAnimation(rotation);
+                setTitle(R.string.loading);
 
                 mMap.clear();
 
@@ -424,6 +402,8 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
                 new PlacesApiTask(SearchActivity.this, SearchActivity.this,myLocationLatLng.latitude, myLocationLatLng.longitude, PARKING).execute();
                 new PlacesApiTask(SearchActivity.this, SearchActivity.this,myLocationLatLng.latitude, myLocationLatLng.longitude, GAS_STATION).execute();
 
+                MenuItem item = menu.findItem(R.id.action_add);
+                item.setVisible(true);
 
             }
         });
@@ -583,6 +563,7 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
 
             if(rotation.isInitialized()) {
                 rotation.cancel();
+                setTitle(R.string.app_name);
             }
         }
     }
