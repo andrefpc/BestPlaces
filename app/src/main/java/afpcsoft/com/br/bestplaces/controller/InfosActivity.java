@@ -39,9 +39,11 @@ import android.widget.TextView;
 import afpcsoft.com.br.bestplaces.R;
 import afpcsoft.com.br.bestplaces.Utils.DialogUtils;
 import afpcsoft.com.br.bestplaces.model.ItemPrices;
+import afpcsoft.com.br.bestplaces.model.Place;
 import afpcsoft.com.br.bestplaces.model.detailsPlacesApi.DetailsApiResult;
 import afpcsoft.com.br.bestplaces.model.placesApi.ResultPlaces;
 import afpcsoft.com.br.bestplaces.service.DetailsApiTask;
+import afpcsoft.com.br.bestplaces.service.DetailsNativeTask;
 
 public class InfosActivity extends ActionBarActivity implements ActionBar.TabListener {
 
@@ -59,7 +61,9 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
-    ResultPlaces resultPlaces;
+    public int tag;
+    public ResultPlaces resultPlaces;
+    public Place place;
 
     public static int ADD_PHONE = 1;
     public static int ADD_SITE = 2;
@@ -138,7 +142,12 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
         saveData = (Button) findViewById(R.id.saveData);
 
         Intent intent = getIntent();
-        resultPlaces = (ResultPlaces) intent.getSerializableExtra("resultPlaces");
+        tag = intent.getIntExtra("tag", 0);
+        if (tag == 1) {
+            resultPlaces = (ResultPlaces) intent.getSerializableExtra("resultPlaces");
+        }else{
+            place = (Place) intent.getSerializableExtra("place");
+        }
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -465,9 +474,9 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
         @Override
         public Fragment getItem(int position) {
             if(position == 0) {
-                return GeneralFragment.newInstance(position + 1, resultPlaces);
+                return GeneralFragment.newInstance(position + 1, resultPlaces, place);
             }else{
-                return PricesFragment.newInstance(position + 1, resultPlaces);
+                return PricesFragment.newInstance(position + 1, resultPlaces, place);
             }
         }
 
@@ -500,14 +509,16 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static ResultPlaces resultPlaces;
+        public static Place place;
         private List <ItemPrices> itemPricesList;
 
         /**
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PricesFragment newInstance(int sectionNumber, ResultPlaces resultPlacesNew) {
+        public static PricesFragment newInstance(int sectionNumber, ResultPlaces resultPlacesNew, Place newPlace) {
             resultPlaces = resultPlacesNew;
+            place = newPlace;
             PricesFragment fragment = new PricesFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
@@ -575,13 +586,14 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
         }
     }
 
-    public static class GeneralFragment extends Fragment implements DetailsApiTask.OnPostExecuteListener {
+    public static class GeneralFragment extends Fragment implements DetailsApiTask.OnPostExecuteListener, DetailsNativeTask.OnPostExecuteListener {
         /**
          * The fragment argument representing the section number for this
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static ResultPlaces resultPlaces;
+        private static Place place;
         private ImageView addPhone;
         private ImageView addSite;
         private ImageView facebookIcon;
@@ -593,8 +605,9 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static GeneralFragment newInstance(int sectionNumber, ResultPlaces newResultPlaces) {
+        public static GeneralFragment newInstance(int sectionNumber, ResultPlaces newResultPlaces, Place newPlace) {
             resultPlaces = newResultPlaces;
+            place = newPlace;
             GeneralFragment fragment = new GeneralFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
@@ -690,7 +703,7 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
 
             ImageView imageNavigation = (ImageView) rootView.findViewById(R.id.navigation);
 
-            if(resultPlaces != null) {
+            if(resultPlaces != null && place == null) {
                 textViewName.setText(resultPlaces.getName());
                 textViewTags.setText(resultPlaces.getTypes().toString());
 
@@ -716,6 +729,38 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
                 });
                 new DetailsApiTask(resultPlaces.getPlaceId(), textViewPhone, textViewAddress, textViewUrl, imageView, loading, getActivity(), this).execute();
 
+            }else if(resultPlaces == null && place != null) {
+                textViewName.setText(place.getName());
+                if(place.getType() == 0){
+                    textViewTags.setText("Restaurante");
+                }else if(place.getType() == 1){
+                    textViewTags.setText("Estacionamento");
+                }else{
+                    textViewTags.setText("Posto");
+                }
+
+                imageStreetView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getActivity(), StreetViewActivity.class);
+                        intent.putExtra("lat", place.getLat());
+                        intent.putExtra("lng", place.getLng());
+                        startActivity(intent);
+                    }
+                });
+
+                imageNavigation.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Double lat = place.getLat();
+                        Double lng = place.getLng();
+                        Intent intent = new Intent(Intent.ACTION_VIEW,
+                                Uri.parse("http://maps.google.com/maps?daddr=" + lat + "," + lng + ""));
+                        startActivity(intent);
+                    }
+                });
+                new DetailsNativeTask(place.getId(), textViewPhone, textViewAddress, textViewUrl, imageView, loading, getActivity(), this).execute();
+
             }else{
             }
 
@@ -734,6 +779,26 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
                 plusUrl = detailsApiResult.getResult().getUrl();
             }
             facebookIcon.setImageResource(R.drawable.facebook_off);
+        }
+
+        @Override
+        public void onPostExecute(Place place) {
+            plusIcon.setImageResource(R.drawable.plus_off);
+            facebookIcon.setImageResource(R.drawable.facebook_off);
+            if(place.getPhone() == null){
+                addPhone.setVisibility(View.VISIBLE);
+            }
+            if(place.getSite() == null){
+                addSite.setVisibility(View.VISIBLE);
+            }
+            if(place.getPlusPage() != null){
+                plusIcon.setImageResource(R.drawable.plus_on);
+                plusUrl = place.getPlusPage();
+            }
+            if(place.getFacebookPage() != null){
+                facebookIcon.setImageResource(R.drawable.facebook_on);
+                facebookUrl = place.getFacebookPage();
+            }
         }
     }
 }

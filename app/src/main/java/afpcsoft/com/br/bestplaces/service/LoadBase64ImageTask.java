@@ -1,8 +1,9 @@
-package afpcsoft.com.br.bestplaces.controller;
+package afpcsoft.com.br.bestplaces.service;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.view.View;
@@ -10,31 +11,24 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import java.io.InputStream;
-import android.net.Uri;
+
+import afpcsoft.com.br.bestplaces.Utils.ImageUtils;
 
 /**
- * Created by AndréFelipe on 17/05/2015.
+ * Created by AndréFelipe on 23/06/2015.
  */
-public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
+public class LoadBase64ImageTask extends AsyncTask<String, Integer, Bitmap> {
     ImageView bmImage;
     ProgressBar progressBar;
-    String url;
-    Uri uri;
+    String base64;
     Context context;
 
-    public DownloadImageTask(ImageView bmImage, ProgressBar progressBar, String url) {
+    public LoadBase64ImageTask(ImageView bmImage, ProgressBar progressBar, String base64, Context context) {
         this.bmImage = bmImage;
         this.progressBar = progressBar;
-        this.url = url;
-    }
-
-    public DownloadImageTask(ImageView bmImage, ProgressBar progressBar, Uri uri, Context context) {
-        this.bmImage = bmImage;
-        this.progressBar = progressBar;
-        this.uri = uri;
+        this.base64 = base64;
         this.context = context;
     }
-
 
 
     @Override
@@ -47,17 +41,7 @@ public class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
     @Override
     protected Bitmap doInBackground(String... urls) {
 
-        Bitmap bitmap = null;
-        try {
-            if(uri == null) {
-                InputStream in = new java.net.URL(url).openStream();
-                bitmap = BitmapFactory.decodeStream(in);
-            }else{
-                bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Bitmap bitmap = new ImageUtils().decodeImageBase64(base64);
         return bitmap;
     }
 

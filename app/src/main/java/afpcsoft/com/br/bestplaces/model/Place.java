@@ -1,36 +1,29 @@
 package afpcsoft.com.br.bestplaces.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class Place implements Serializable{
 
-    private String type;
+    private int id;
     private String name;
     private String description;
     private String address;
     private double lat;
     private double lng;
     private String phone;
+    private int type;
     private String site;
-    private String socialNetwork;
+    @SerializedName("facebook_page")
+    private String facebookPage;
+    @SerializedName("plus_page")
+    private String plusPage;
+    @SerializedName("photo")
     private String imageBase64;
     private int confirmation;
 
     public Place() {
-    }
-
-    public Place(String type, String name, String description, String address, double lat, double lng, String phone, String site, String socialNetwork, String imageBase64, int confirmation) {
-        this.type = type;
-        this.name = name;
-        this.description = description;
-        this.address = address;
-        this.lat = lat;
-        this.lng = lng;
-        this.phone = phone;
-        this.site = site;
-        this.socialNetwork = socialNetwork;
-        this.imageBase64 = imageBase64;
-        this.confirmation = confirmation;
     }
 
     public Place(double lat, double lng) {
@@ -38,12 +31,29 @@ public class Place implements Serializable{
         this.lng = lng;
     }
 
-    public String getType() {
-        return type;
+    public Place(int id, String name, String description, String address, double lat, double lng, String phone, int type, String site, String facebookPage, String plusPage, String imageBase64, int confirmation) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.address = address;
+        this.lat = lat;
+        this.lng = lng;
+        this.phone = phone;
+        this.type = type;
+        this.site = site;
+        this.facebookPage = facebookPage;
+        this.plusPage = plusPage;
+        this.imageBase64 = imageBase64;
+        this.confirmation = confirmation;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public int getId() {
+
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -94,6 +104,14 @@ public class Place implements Serializable{
         this.phone = phone;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     public String getSite() {
         return site;
     }
@@ -102,12 +120,20 @@ public class Place implements Serializable{
         this.site = site;
     }
 
-    public String getSocialNetwork() {
-        return socialNetwork;
+    public String getFacebookPage() {
+        return facebookPage;
     }
 
-    public void setSocialNetwork(String socialNetwork) {
-        this.socialNetwork = socialNetwork;
+    public void setFacebookPage(String facebookPage) {
+        this.facebookPage = facebookPage;
+    }
+
+    public String getPlusPage() {
+        return plusPage;
+    }
+
+    public void setPlusPage(String plusPage) {
+        this.plusPage = plusPage;
     }
 
     public String getImageBase64() {

@@ -11,8 +11,6 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
-import org.w3c.dom.Text;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,10 +21,8 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import afpcsoft.com.br.bestplaces.R;
-import afpcsoft.com.br.bestplaces.controller.DownloadImageTask;
 import afpcsoft.com.br.bestplaces.model.detailsPlacesApi.DetailsApiResult;
 import afpcsoft.com.br.bestplaces.model.detailsPlacesApi.PhotoDetails;
-import afpcsoft.com.br.bestplaces.model.placesApi.PlacesApiResult;
 
 /**
  * Created by AndréFelipe on 17/05/2015.

@@ -14,25 +14,12 @@ public class LocalResult {
 
     private int onPostFlag;
     private MyLocal myLocal;
-    private List<Posto> postos;
-    private List<Bar> bares;
-    private List<Estacionamento> estacionamentos;
-    private List<Restaurante> restaurantes;
-    private List<Hospital> hospitais;
-    private List<FastFood> fastFoods;
 
     public LocalResult() {
     }
 
-    public LocalResult(int onPostFlag, MyLocal myLocal, List<Posto> postos, List<Bar> bares, List<Estacionamento> estacionamentos, List<Restaurante> restaurantes, List<Hospital> hospitais, List<FastFood> fastFoods) {
-        this.onPostFlag = onPostFlag;
+    public LocalResult(MyLocal myLocal) {
         this.myLocal = myLocal;
-        this.postos = postos;
-        this.bares = bares;
-        this.estacionamentos = estacionamentos;
-        this.restaurantes = restaurantes;
-        this.hospitais = hospitais;
-        this.fastFoods = fastFoods;
     }
 
     public int getOnPostFlag() {
@@ -51,51 +38,4 @@ public class LocalResult {
         this.myLocal = myLocal;
     }
 
-    public List<Posto> getPostos() {
-        return postos;
-    }
-
-    public void setPostos(List<Posto> postos) {
-        this.postos = postos;
-    }
-
-    public List<Bar> getBares() {
-        return bares;
-    }
-
-    public void setBares(List<Bar> bares) {
-        this.bares = bares;
-    }
-
-    public List<Estacionamento> getEstacionamentos() {
-        return estacionamentos;
-    }
-
-    public void setEstacionamentos(List<Estacionamento> estacionamentos) {
-        this.estacionamentos = estacionamentos;
-    }
-
-    public List<Restaurante> getRestaurantes() {
-        return restaurantes;
-    }
-
-    public void setRestaurantes(List<Restaurante> restaurantes) {
-        this.restaurantes = restaurantes;
-    }
-
-    public List<Hospital> getHospitais() {
-        return hospitais;
-    }
-
-    public void setHospitais(List<Hospital> hospitais) {
-        this.hospitais = hospitais;
-    }
-
-    public List<FastFood> getFastFoods() {
-        return fastFoods;
-    }
-
-    public void setFastFoods(List<FastFood> fastFoods) {
-        this.fastFoods = fastFoods;
-    }
 }

@@ -32,7 +32,8 @@
     <string name="add_place_description_title">Descrição</string>
     <string name="add_place_phone_title">Telefone</string>
     <string name="add_place_site_title">Site</string>
-    <string name="add_place_social_network_title">Rede Social</string>
+    <string name="add_place_facebook_title">Facebook</string>
+    <string name="add_place_plus_title">Google+</string>
     <string name="add_place_type_title">Tipo</string>
     <string name="add_place_foto_title">Foto</string>
 

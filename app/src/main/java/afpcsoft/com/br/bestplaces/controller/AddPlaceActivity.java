@@ -34,17 +34,22 @@ public class AddPlaceActivity extends ActionBarActivity {
     private File photo;
     private String photoName;
 
+    private static int RESTAURANTE = 0;
+    private static int ESTACIONAMENTO = 1;
+    private static int POSTO = 2;
+
     private EditText nameEditText;
     private EditText descriptionEditText;
     private EditText phoneEditText;
     private EditText siteEditText;
-    private EditText socialNetworkEditText;
+    private EditText facebookEditText;
+    private EditText plusEditText;
     private Button addPhoto;
     private Button savePlace;
 
 //    private TextView textPhoto;
 
-    private String type;
+    private int type;
 
     private Switch switchRestaurant;
     private Switch switchParking;
@@ -79,7 +84,8 @@ public class AddPlaceActivity extends ActionBarActivity {
         descriptionEditText = (EditText) findViewById(R.id.descriptionEditText);
         phoneEditText = (EditText) findViewById(R.id.phoneEditText);
         siteEditText = (EditText) findViewById(R.id.siteEditText);
-        socialNetworkEditText = (EditText) findViewById(R.id.socialNetworkEditText);
+        facebookEditText = (EditText) findViewById(R.id.facebookEditText);
+        plusEditText = (EditText) findViewById(R.id.plusEditText);
         savePlace = (Button) findViewById(R.id.savePlace);
 
         switchRestaurant = (Switch) findViewById(R.id.swichRestaurant);
@@ -91,7 +97,7 @@ public class AddPlaceActivity extends ActionBarActivity {
                 if (isChecked) {
                     switchGasStation.setChecked(false);
                     switchParking.setChecked(false);
-                    type = "Restaurante";
+                    type = RESTAURANTE;
                 }
             }
         });
@@ -104,7 +110,7 @@ public class AddPlaceActivity extends ActionBarActivity {
                 if (isChecked) {
                     switchGasStation.setChecked(false);
                     switchRestaurant.setChecked(false);
-                    type = "Estacionamento";
+                    type = ESTACIONAMENTO;
                 }
             }
         });
@@ -117,7 +123,7 @@ public class AddPlaceActivity extends ActionBarActivity {
                 if (isChecked) {
                     switchParking.setChecked(false);
                     switchRestaurant.setChecked(false);
-                    type = "Posto";
+                    type = POSTO;
                 }
             }
         });
@@ -165,7 +171,8 @@ public class AddPlaceActivity extends ActionBarActivity {
                     place.setDescription(descriptionEditText.getText().toString());
                     place.setPhone(phoneEditText.getText().toString());
                     place.setSite(siteEditText.getText().toString());
-                    place.setSocialNetwork(socialNetworkEditText.getText().toString());
+                    place.setFacebookPage(facebookEditText.getText().toString());
+                    place.setPlusPage(plusEditText.getText().toString());
                     place.setType(type);
 
                     new AddPlaceTask(AddPlaceActivity.this, place).execute();

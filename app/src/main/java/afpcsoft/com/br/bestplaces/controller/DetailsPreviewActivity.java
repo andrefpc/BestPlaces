@@ -37,7 +37,20 @@ public class DetailsPreviewActivity extends ActionBarActivity {
         TextView textViewUrl = (TextView) findViewById(R.id.site);
         textViewUrl.setText(place.getSite());
         TextView textViewTags = (TextView) findViewById(R.id.type);
-        textViewTags.setText(place.getType());
+
+        String typeString = "";
+        switch (place.getType()){
+            case 0:
+                typeString = "Restaurante";
+                break;
+            case 1:
+                typeString = "Estacionamento";
+                break;
+            case 2:
+                typeString = "Posto";
+                break;
+        }
+        textViewTags.setText(typeString);
 
         Bitmap bitmap = new ImageUtils().decodeImageBase64(place.getImageBase64());
         bitmap = ImageUtils.rotateBitmap(bitmap);

@@ -34,6 +34,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import afpcsoft.com.br.bestplaces.R;
@@ -42,10 +43,12 @@ import afpcsoft.com.br.bestplaces.model.MyLocal;
 import afpcsoft.com.br.bestplaces.model.Place;
 import afpcsoft.com.br.bestplaces.model.placesApi.PlacesApiResult;
 import afpcsoft.com.br.bestplaces.model.placesApi.ResultPlaces;
+import afpcsoft.com.br.bestplaces.service.DownloadImageTask;
 import afpcsoft.com.br.bestplaces.service.MyLocation;
+import afpcsoft.com.br.bestplaces.service.NativePlacesTask;
 import afpcsoft.com.br.bestplaces.service.PlacesApiTask;
 
-public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostExecuteListener {
+public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostExecuteListener, NativePlacesTask.OnPostExecuteListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private MarkerOptions myLocationMarker;
@@ -54,6 +57,10 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
     private static String RESTAURANT = "restaurant";
     private static String PARKING = "parking";
     private static String GAS_STATION = "gas_station";
+
+    private static String MY_LOCAL = "My Local";
+    private static String PLACES_API = "Places API";
+    private static String PLACES_NATIVE = "Places Native";
 
     PlacesApiResult placesApiResultRestaurant;
     PlacesApiResult placesApiResultParking;
@@ -67,6 +74,7 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
     Map<View, LinearLayout> viewMap;
 
     Map <String, ResultPlaces> resultPlacesMap;
+    Map <String, Place> nativePlacesMap;
 
     private LinearLayout layoutGeral;
 
@@ -123,6 +131,7 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
 
 
         resultPlacesMap = new HashMap<String, ResultPlaces>();
+        nativePlacesMap = new HashMap<String, Place>();
 
         rotation= new RotateAnimation(0f,360f, Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
         rotation.setDuration(600);
@@ -132,7 +141,7 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
         shake = AnimationUtils.loadAnimation(MapsActivity.this, R.anim.shake);
 
         myLocationMarker = new MarkerOptions();
-        myLocationMarker.title("My local");
+        myLocationMarker.title(MY_LOCAL);
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user));
 
         generateFilter();
@@ -436,6 +445,10 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
                     new PlacesApiTask(MapsActivity.this, MapsActivity.this,myLocal.getLocation().getLatitude(), myLocal.getLocation().getLongitude(), PARKING).execute();
                     new PlacesApiTask(MapsActivity.this, MapsActivity.this,myLocal.getLocation().getLatitude(), myLocal.getLocation().getLongitude(), GAS_STATION).execute();
 
+                    new NativePlacesTask(MapsActivity.this, MapsActivity.this, 0).execute();
+                    new NativePlacesTask(MapsActivity.this, MapsActivity.this, 1).execute();
+                    new NativePlacesTask(MapsActivity.this, MapsActivity.this, 2).execute();
+
                     place = new Place(location.getLatitude(), location.getLongitude());
 
                     MenuItem item = menu.findItem(R.id.action_add);
@@ -481,14 +494,23 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
 
                 viewGroup = (ViewGroup) getLayoutInflater().inflate(R.layout.info_window_layout, null);
 
-                if(!marker.getTitle().equals("My local")) {
+                if(!marker.getTitle().equals(MY_LOCAL) && marker.getTitle().equals(PLACES_API)) {
                     layoutGeral.setVisibility(View.GONE);
                     LinearLayout layoutInfoWindow = (LinearLayout) viewGroup.findViewById(R.id.layoutInfoWindow);
                     TextView nameInfoWindow = (TextView) viewGroup.findViewById(R.id.name);
                     TextView localInfoWindow = (TextView) viewGroup.findViewById(R.id.endereco);
-                    nameInfoWindow.setText(marker.getTitle());
                     ResultPlaces resultPlaces = resultPlacesMap.get(marker.getSnippet());
+                    nameInfoWindow.setText(resultPlaces.getName());
                     localInfoWindow.setText(resultPlaces.getVicinity());
+                    layoutInfoWindow.setBackgroundColor(getResources().getColor(R.color.material_blue_grey_800));
+                }else if(!marker.getTitle().equals(MY_LOCAL) && marker.getTitle().equals(PLACES_NATIVE)){
+                    layoutGeral.setVisibility(View.GONE);
+                    LinearLayout layoutInfoWindow = (LinearLayout) viewGroup.findViewById(R.id.layoutInfoWindow);
+                    TextView nameInfoWindow = (TextView) viewGroup.findViewById(R.id.name);
+                    TextView localInfoWindow = (TextView) viewGroup.findViewById(R.id.endereco);
+                    Place place = nativePlacesMap.get(marker.getSnippet());
+                    nameInfoWindow.setText(place.getName());
+                    localInfoWindow.setText(place.getAddress());
                     layoutInfoWindow.setBackgroundColor(getResources().getColor(R.color.material_blue_grey_800));
                 }
 
@@ -514,10 +536,17 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
             @Override
             public void onInfoWindowClick(final Marker marker) {
 
-                if(!marker.getTitle().equals("My local")) {
+                if(!marker.getTitle().equals(MY_LOCAL) && marker.getTitle().equals(PLACES_API)) {
                     Intent intent = new Intent(MapsActivity.this, InfosActivity.class);
                     ResultPlaces resultPlaces = resultPlacesMap.get(marker.getSnippet());
+                    intent.putExtra("tag", 1);
                     intent.putExtra("resultPlaces", resultPlaces);
+                    startActivity(intent);
+                }else if(!marker.getTitle().equals(MY_LOCAL) && marker.getTitle().equals(PLACES_NATIVE)) {
+                    Intent intent = new Intent(MapsActivity.this, InfosActivity.class);
+                    Place place = nativePlacesMap.get(marker.getSnippet());
+                    intent.putExtra("tag", 2);
+                    intent.putExtra("place", place);
                     startActivity(intent);
                 }
             }
@@ -550,7 +579,13 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
                             myLocal.setLocation(location);
                             generateMyLocalMarker(myLocal);
 
-                            new PlacesApiTask(MapsActivity.this, MapsActivity.this,myLocal.getLocation().getLatitude(), myLocal.getLocation().getLongitude(), "gas_station").execute();
+                            new PlacesApiTask(MapsActivity.this, MapsActivity.this,myLocal.getLocation().getLatitude(), myLocal.getLocation().getLongitude(), RESTAURANT).execute();
+                            new PlacesApiTask(MapsActivity.this, MapsActivity.this,myLocal.getLocation().getLatitude(), myLocal.getLocation().getLongitude(), PARKING).execute();
+                            new PlacesApiTask(MapsActivity.this, MapsActivity.this,myLocal.getLocation().getLatitude(), myLocal.getLocation().getLongitude(), GAS_STATION).execute();
+
+                            new NativePlacesTask(MapsActivity.this, MapsActivity.this, 0).execute();
+                            new NativePlacesTask(MapsActivity.this, MapsActivity.this, 1).execute();
+                            new NativePlacesTask(MapsActivity.this, MapsActivity.this, 2).execute();
 
                         }
                     };
@@ -605,7 +640,7 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
 
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(new LatLng(latitude, longitude))
-                    .title(resultPlaces.getName())
+                    .title(PLACES_API)
                     .snippet(resultPlaces.getId());
 
             if(placesApiResult.getType().equals(RESTAURANT)){
@@ -628,4 +663,49 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
             }
         }
     }
+
+    @Override
+    public void onPostExecute(List<Place> result) {
+        for (Place place: result){
+            Log.i("PLACES NATIVE", "ID: " + place.getId());
+        }
+
+        GenerateMarkersPlacesNative(result);
+    }
+
+    private void GenerateMarkersPlacesNative(List<Place> places) {
+        for (Place place : places){
+            nativePlacesMap.put(String.valueOf(place.getId()), place);
+            double latitude = place.getLat();
+            double longitude = place.getLng();
+
+            Log.i("PLACES_NATIVE", latitude + "/" + longitude);
+
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(new LatLng(latitude, longitude))
+                    .title(PLACES_NATIVE)
+                    .snippet(String.valueOf(place.getId()));
+
+            if(place.getType() == 0){
+                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant));
+            }else if(place.getType() == 1){
+                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.parking));
+            }else if(place.getType() == 2){
+                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.gas_station));
+            }
+
+            if (latitude != 0.0 || longitude != 0.0) {
+                mMap.addMarker(markerOptions);
+                performClickInfoWindow();
+
+            }
+
+            if(rotation.isInitialized()) {
+                rotation.cancel();
+                setTitle(R.string.app_name);
+            }
+        }
+    }
+
+
 }

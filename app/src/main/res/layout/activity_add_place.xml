@@ -311,13 +311,14 @@
 
                 </LinearLayout>
 
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="10dp">
                     <TextView
-                        android:text="@string/add_place_social_network_title"
+                        android:text="@string/add_place_facebook_title"
                         android:textSize="20sp"
                         android:padding="10dp"
                         android:layout_width="wrap_content"
@@ -331,7 +332,35 @@
                         android:paddingLeft="10dp"
                         android:background="@color/ripple_material_dark">
                         <EditText
-                            android:id="@+id/socialNetworkEditText"
+                            android:id="@+id/facebookEditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@android:color/white"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+                    <TextView
+                        android:text="@string/add_place_plus_title"
+                        android:textSize="20sp"
+                        android:padding="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/white"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingRight="10dp"
+                        android:paddingLeft="10dp"
+                        android:background="@color/ripple_material_dark">
+                        <EditText
+                            android:id="@+id/plusEditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textColor="@android:color/white"/>

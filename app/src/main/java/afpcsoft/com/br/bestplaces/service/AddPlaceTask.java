@@ -29,6 +29,7 @@ import java.util.Locale;
 
 import afpcsoft.com.br.bestplaces.R;
 import afpcsoft.com.br.bestplaces.Utils.DialogUtils;
+import afpcsoft.com.br.bestplaces.Utils.HttpUtils;
 import afpcsoft.com.br.bestplaces.Utils.ImageUtils;
 import afpcsoft.com.br.bestplaces.controller.DetailsPreviewActivity;
 import afpcsoft.com.br.bestplaces.model.Place;
@@ -84,6 +85,8 @@ public class AddPlaceTask extends AsyncTask<String, Void, String> {
             }
         }
 
+        String url = "http://ec2-54-153-109-26.us-west-1.compute.amazonaws.com/Service.php?servico=insertPlace";
+
         List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(10);
 
         nameValuePair.add(new BasicNameValuePair("name", place.getName()));
@@ -92,12 +95,13 @@ public class AddPlaceTask extends AsyncTask<String, Void, String> {
         nameValuePair.add(new BasicNameValuePair("lat", String.valueOf(place.getLat())));
         nameValuePair.add(new BasicNameValuePair("lng", String.valueOf(place.getLng())));
         nameValuePair.add(new BasicNameValuePair("phone", place.getPhone()));
-        nameValuePair.add(new BasicNameValuePair("type", place.getType()));
+        nameValuePair.add(new BasicNameValuePair("type", String.valueOf(place.getType())));
         nameValuePair.add(new BasicNameValuePair("site", place.getSite()));
-        nameValuePair.add(new BasicNameValuePair("socialNetWork", place.getSocialNetwork()));
+        nameValuePair.add(new BasicNameValuePair("facebookPage", place.getFacebookPage()));
+        nameValuePair.add(new BasicNameValuePair("plusPage", place.getPlusPage()));
         nameValuePair.add(new BasicNameValuePair("photo", imgBase64));
 
-        String result = makePostRequest(nameValuePair);
+        String result = HttpUtils.makePostRequest(nameValuePair, url);
 
         Log.i("IMAGE ENCODED", imgBase64);
 
@@ -107,9 +111,9 @@ public class AddPlaceTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        Log.i("IMAGE ENCODED", result);
+        Log.i("HTTP RESULT", result);
 
-        if(result.equals("true")){
+        if(result.equals("\t1")){
             Intent intent = new Intent(context, DetailsPreviewActivity.class);
             intent.putExtra("place", place);
             context.startActivity(intent);
@@ -122,63 +126,4 @@ public class AddPlaceTask extends AsyncTask<String, Void, String> {
         Toast.makeText(context, "Terminou de enviar", Toast.LENGTH_LONG).show();
 
     }
-
-    private String makePostRequest(List<NameValuePair> nameValuePair) {
-
-        HttpClient httpClient = new DefaultHttpClient();
-
-        HttpPost httpPost = new HttpPost("http://ec2-54-153-109-26.us-west-1.compute.amazonaws.com/Service.php?servico=insertPlace"); // replace with
-        // your url
-
-        // Encoding data
-
-        try {
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-        } catch (UnsupportedEncodingException e) {
-            // log exception
-            e.printStackTrace();
-        }
-
-        // making request
-
-        try {
-            HttpResponse response = httpClient.execute(httpPost);
-            // write response to log
-            Log.d("Http Post Response:", response.toString());
-
-            String responseString = new BasicResponseHandler().handleResponse(response);
-            return responseString;
-        } catch (ClientProtocolException e) {
-            // Log exception
-            e.printStackTrace();
-            return e.getMessage();
-        } catch (IOException e) {
-            // Log exception
-            e.printStackTrace();
-            return e.getMessage();
-        }
-
-    }
-
-    private void makeGetRequest() {
-
-        HttpClient client = new DefaultHttpClient();
-        HttpGet request = new HttpGet("www.example.com"); // replace with your
-        // url
-        // making request
-
-        HttpResponse response;
-        try {
-            response = client.execute(request);
-            Log.d("Response of GET request", response.toString());
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-    }
-
 }

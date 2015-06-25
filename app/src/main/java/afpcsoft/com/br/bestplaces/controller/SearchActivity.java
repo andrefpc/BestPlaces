@@ -36,8 +36,10 @@ import java.util.Map;
 
 import afpcsoft.com.br.bestplaces.R;
 import afpcsoft.com.br.bestplaces.Utils.DialogUtils;
+import afpcsoft.com.br.bestplaces.model.Place;
 import afpcsoft.com.br.bestplaces.model.placesApi.PlacesApiResult;
 import afpcsoft.com.br.bestplaces.model.placesApi.ResultPlaces;
+import afpcsoft.com.br.bestplaces.service.DownloadImageTask;
 import afpcsoft.com.br.bestplaces.service.PlacesApiTask;
 
 /**
@@ -56,6 +58,8 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
     PlacesApiResult placesApiResultRestaurant;
     PlacesApiResult placesApiResultParking;
     PlacesApiResult placesApiResultGasStation;
+
+    private Place place;
 
     private RotateAnimation rotation;
 
@@ -178,6 +182,8 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
             }
         }else if(id == R.id.action_add){
             Intent intent = new Intent(getApplicationContext(), AddPlaceActivity.class);
+            intent.putExtra("place", place);
+
             startActivity(intent);
         }
 
@@ -396,6 +402,8 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
                 locationSetted = myLocationLatLng;
+
+                place = new Place(myLocationLatLng.latitude, myLocationLatLng.longitude);
 
 
                 new PlacesApiTask(SearchActivity.this, SearchActivity.this,myLocationLatLng.latitude, myLocationLatLng.longitude, RESTAURANT).execute();
