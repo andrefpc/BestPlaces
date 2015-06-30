@@ -83,5 +83,14 @@
 
     <string name="addPhone">Adicionar telefone</string>
     <string name="addSite">Adicionar site</string>
+    <string name="addPlus">Adicionar Google+</string>
+    <string name="addFace">Adicionar Facebook</string>
+
+
+
+    <string name="sucessUpdatePhone">Telefone alterado com sucesso!</string>
+    <string name="sucessUpdateSite">Site alterado com sucesso!</string>
+    <string name="sucessUpdateFace">Facebook alterado com sucesso!</string>
+    <string name="sucessUpdatePlus">Google+ alterado com sucesso!</string>
 
 </resources>

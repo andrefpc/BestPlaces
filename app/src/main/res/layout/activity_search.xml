@@ -27,6 +27,7 @@
                     android:name="com.google.android.gms.maps.SupportMapFragment" >
 
                     <LinearLayout
+                        android:id="@+id/layout1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -47,6 +48,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/layout2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -67,6 +69,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/layout3"
                         android:layout_width="95dp"
                         android:layout_height="95dp"
                         android:layout_gravity="center"
@@ -79,6 +82,7 @@
                             android:src="@drawable/marker_user"/>
                     </LinearLayout>
                     <LinearLayout
+                        android:id="@+id/layout4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|top"

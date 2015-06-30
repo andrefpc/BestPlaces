@@ -47,7 +47,7 @@ public class HttpUtils {
             Log.d("Http Post Response:", response.toString());
 
             String responseString = new BasicResponseHandler().handleResponse(response);
-            responseString = new String(responseString.getBytes(), Charset.forName("UTF-8"));
+            responseString = responseString.trim();
             return responseString;
         } catch (ClientProtocolException e) {
             // Log exception
@@ -73,6 +73,7 @@ public class HttpUtils {
             response = client.execute(request);
             Log.d("Response of GET request", response.toString());
             String responseString = new BasicResponseHandler().handleResponse(response);
+            responseString = responseString.trim();
             return responseString;
         } catch (ClientProtocolException e) {
             // TODO Auto-generated catch block

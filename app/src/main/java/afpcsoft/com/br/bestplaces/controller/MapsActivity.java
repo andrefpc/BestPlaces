@@ -39,12 +39,13 @@ import java.util.Map;
 
 import afpcsoft.com.br.bestplaces.R;
 import afpcsoft.com.br.bestplaces.Utils.DialogUtils;
+import afpcsoft.com.br.bestplaces.Utils.StaticValues;
 import afpcsoft.com.br.bestplaces.model.MyLocal;
 import afpcsoft.com.br.bestplaces.model.Place;
 import afpcsoft.com.br.bestplaces.model.placesApi.PlacesApiResult;
 import afpcsoft.com.br.bestplaces.model.placesApi.ResultPlaces;
 import afpcsoft.com.br.bestplaces.service.DownloadImageTask;
-import afpcsoft.com.br.bestplaces.service.MyLocation;
+import afpcsoft.com.br.bestplaces.service.MyLocationTask;
 import afpcsoft.com.br.bestplaces.service.NativePlacesTask;
 import afpcsoft.com.br.bestplaces.service.PlacesApiTask;
 
@@ -433,7 +434,7 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
             rotation.setRepeatCount(RotateAnimation.INFINITE);
             refresh.startAnimation(rotation);
             setTitle(R.string.loading);
-            MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
+            MyLocationTask.LocationResult locationResult = new MyLocationTask.LocationResult(){
                 @Override
                 public void gotLocation(Location location){
 //                    mMap.clear();
@@ -455,8 +456,8 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
                     item.setVisible(true);
                 }
             };
-            MyLocation myLocation = new MyLocation();
-            myLocation.getLocation(this, locationResult);
+            MyLocationTask myLocationTask = new MyLocationTask();
+            myLocationTask.getLocation(this, locationResult);
 
         }else{
             DialogUtils.showGPSDisabledAlertToUser(MapsActivity.this, profile);
@@ -539,13 +540,13 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
                 if(!marker.getTitle().equals(MY_LOCAL) && marker.getTitle().equals(PLACES_API)) {
                     Intent intent = new Intent(MapsActivity.this, InfosActivity.class);
                     ResultPlaces resultPlaces = resultPlacesMap.get(marker.getSnippet());
-                    intent.putExtra("tag", 1);
+                    intent.putExtra("tag", StaticValues.GoogleAPIPlaces);
                     intent.putExtra("resultPlaces", resultPlaces);
                     startActivity(intent);
                 }else if(!marker.getTitle().equals(MY_LOCAL) && marker.getTitle().equals(PLACES_NATIVE)) {
                     Intent intent = new Intent(MapsActivity.this, InfosActivity.class);
                     Place place = nativePlacesMap.get(marker.getSnippet());
-                    intent.putExtra("tag", 2);
+                    intent.putExtra("tag", StaticValues.NativePlaces);
                     intent.putExtra("place", place);
                     startActivity(intent);
                 }
@@ -571,7 +572,7 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
                     rotation.setRepeatCount(RotateAnimation.INFINITE);
                     refresh.startAnimation(rotation);
                     setTitle(R.string.loading);
-                    MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
+                    MyLocationTask.LocationResult locationResult = new MyLocationTask.LocationResult(){
                         @Override
                         public void gotLocation(Location location){
                             mMap.clear();
@@ -589,8 +590,8 @@ public class MapsActivity extends BaseActivity implements PlacesApiTask.OnPostEx
 
                         }
                     };
-                    MyLocation myLocation = new MyLocation();
-                    myLocation.getLocation(this, locationResult);
+                    MyLocationTask myLocationTask = new MyLocationTask();
+                    myLocationTask.getLocation(this, locationResult);
 
                 }
 //            }

@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.zip.Inflater;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -35,17 +36,27 @@ import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 
 import afpcsoft.com.br.bestplaces.R;
 import afpcsoft.com.br.bestplaces.Utils.DialogUtils;
+import afpcsoft.com.br.bestplaces.Utils.StaticValues;
 import afpcsoft.com.br.bestplaces.model.ItemPrices;
 import afpcsoft.com.br.bestplaces.model.Place;
+import afpcsoft.com.br.bestplaces.model.PlaceApiEdited;
+import afpcsoft.com.br.bestplaces.model.Price;
 import afpcsoft.com.br.bestplaces.model.detailsPlacesApi.DetailsApiResult;
 import afpcsoft.com.br.bestplaces.model.placesApi.ResultPlaces;
+import afpcsoft.com.br.bestplaces.service.AddPriceTask;
+import afpcsoft.com.br.bestplaces.service.DetailsApiEditedTask;
 import afpcsoft.com.br.bestplaces.service.DetailsApiTask;
 import afpcsoft.com.br.bestplaces.service.DetailsNativeTask;
+import afpcsoft.com.br.bestplaces.service.ListPricesTask;
+import afpcsoft.com.br.bestplaces.service.UpdatePlaceTask;
 
-public class InfosActivity extends ActionBarActivity implements ActionBar.TabListener {
+public class InfosActivity extends ActionBarActivity implements ActionBar.TabListener, UpdatePlaceTask.OnPostExecuteListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -64,15 +75,16 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
     public int tag;
     public ResultPlaces resultPlaces;
     public Place place;
+    public PlaceApiEdited placeApiEdited;
 
     public static int ADD_PHONE = 1;
     public static int ADD_SITE = 2;
-
+    public static int ADD_FACE = 3;
+    public static int ADD_PLUS = 4;
 
     protected DrawerLayout drawerLayoutLeft;
     protected LinearLayout drawerLeft;
     protected boolean openDrawableLeft;
-
 
     protected DrawerLayout drawerLayoutRight;
     protected LinearLayout drawerRight;
@@ -88,8 +100,12 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
 
     private LinearLayout layoutPhone;
     private LinearLayout layoutSite;
+    private LinearLayout layoutFace;
+    private LinearLayout layoutPlus;
     private EditText phoneEditText;
     private EditText siteEditText;
+    private EditText faceEditText;
+    private EditText plusEditText;
     private Button saveData;
 
     public Button submit;
@@ -99,6 +115,15 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_infos);
+
+        Intent intent = getIntent();
+        tag = intent.getIntExtra("tag", 0);
+        if (tag == StaticValues.GoogleAPIPlaces) {
+            resultPlaces = (ResultPlaces) intent.getSerializableExtra("resultPlaces");
+            placeApiEdited = new PlaceApiEdited(resultPlaces.getPlaceId());
+        }else if(tag == StaticValues.NativePlaces ){
+            place = (Place) intent.getSerializableExtra("place");
+        }
 
         getOverflowMenu();
         rightMenu();
@@ -137,17 +162,51 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
 
         layoutPhone = (LinearLayout) findViewById(R.id.layoutPhone);
         layoutSite = (LinearLayout) findViewById(R.id.layoutSite);
+        layoutPlus = (LinearLayout) findViewById(R.id.layoutPlus);
+        layoutFace = (LinearLayout) findViewById(R.id.layoutFace);
         phoneEditText = (EditText) findViewById(R.id.phoneEditText);
         siteEditText = (EditText) findViewById(R.id.siteEditText);
+        faceEditText = (EditText) findViewById(R.id.faceEditText);
+        plusEditText = (EditText) findViewById(R.id.plusEditText);
         saveData = (Button) findViewById(R.id.saveData);
 
-        Intent intent = getIntent();
-        tag = intent.getIntExtra("tag", 0);
-        if (tag == 1) {
-            resultPlaces = (ResultPlaces) intent.getSerializableExtra("resultPlaces");
-        }else{
-            place = (Place) intent.getSerializableExtra("place");
-        }
+        saveData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int item = 0;
+                int type = 0;
+                int placeId = 0;
+                String placeApiId = "";
+                String itemStr = "";
+
+                if(!phoneEditText.getText().toString().equals("")){
+                    item = StaticValues.PHONE;
+                    itemStr = phoneEditText.getText().toString();
+                }else if(!siteEditText.getText().toString().equals("")){
+                    item = StaticValues.SITE;
+                    itemStr = siteEditText.getText().toString();
+                }else if(!faceEditText.getText().toString().equals("")){
+                    item = StaticValues.FACE;
+                    itemStr = faceEditText.getText().toString();
+                }else if(!plusEditText.getText().toString().equals("")){
+                    item = StaticValues.PLUS;
+                    itemStr = plusEditText.getText().toString();
+                }
+
+                if (tag == StaticValues.GoogleAPIPlaces) {
+                    type = StaticValues.GoogleAPIPlaces;
+                    placeApiId = resultPlaces.getPlaceId();
+                }else if(tag == StaticValues.NativePlaces ){
+                    type = StaticValues.NativePlaces;
+                    placeId = place.getId();
+                }
+
+                new UpdatePlaceTask(InfosActivity.this, type, item, placeId, placeApiId, itemStr, InfosActivity.this).execute();
+                closeLeftDrawer();
+            }
+        });
+
+
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -183,16 +242,24 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
         }
     }
 
-    public ItemPrices getItemSubmited(){
-        ItemPrices itemPrices = new ItemPrices();
-        itemPrices.setItem(title.getText().toString());
-        itemPrices.setDescription(desciption.getText().toString());
-        if(np1.getValue() > 0) {
-            itemPrices.setPrice("R$ " + np1.getValue() + np2.getValue() + np3.getValue() + "," + np4.getValue() + np5.getValue());
-        }else{
-            itemPrices.setPrice("R$ " + np2.getValue() + np3.getValue() + "," + np4.getValue() + np5.getValue());
+    public Price getItemSubmited(){
+        Price price = new Price();
+        price.setName(title.getText().toString());
+        price.setDescription(desciption.getText().toString());
+        if(np1.getValue() > 0 && np2.getValue() > 0) {
+            price.setPrice("R$ " + np1.getValue() + np2.getValue() + np3.getValue() + "," + np4.getValue() + np5.getValue());
+        }else if(np1.getValue() == 0 && np2.getValue() > 0) {
+            price.setPrice("R$ " + np2.getValue() + np3.getValue() + "," + np4.getValue() + np5.getValue());
+        }else if(np1.getValue() == 0 && np2.getValue() == 0) {
+            price.setPrice("R$ " + np3.getValue() + "," + np4.getValue() + np5.getValue());
         }
-        return itemPrices;
+        price.setType(tag);
+        if (tag == StaticValues.GoogleAPIPlaces) {
+            price.setPlaceApiIdString(placeApiEdited.getPlaceApiId());
+        }else if(tag == StaticValues.NativePlaces ){
+            price.setNativePlaceId(place.getId());
+        }
+        return price;
     }
 
     public void resetView(){
@@ -434,9 +501,23 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
         if(type == ADD_PHONE){
             layoutPhone.setVisibility(View.VISIBLE);
             layoutSite.setVisibility(View.GONE);
+            layoutFace.setVisibility(View.GONE);
+            layoutPlus.setVisibility(View.GONE);
         }else if(type == ADD_SITE){
             layoutSite.setVisibility(View.VISIBLE);
             layoutPhone.setVisibility(View.GONE);
+            layoutFace.setVisibility(View.GONE);
+            layoutPlus.setVisibility(View.GONE);
+        }else if(type == ADD_FACE){
+            layoutFace.setVisibility(View.VISIBLE);
+            layoutSite.setVisibility(View.GONE);
+            layoutPhone.setVisibility(View.GONE);
+            layoutPlus.setVisibility(View.GONE);
+        }else if(type == ADD_PLUS){
+            layoutPlus.setVisibility(View.VISIBLE);
+            layoutSite.setVisibility(View.GONE);
+            layoutPhone.setVisibility(View.GONE);
+            layoutFace.setVisibility(View.GONE);
         }
     }
 
@@ -459,6 +540,10 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
+    @Override
+    public void onPostExecute(String result) {
+        startActivity(getIntent());
+    }
 
 
     /**
@@ -502,7 +587,7 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PricesFragment extends Fragment {
+    public static class PricesFragment extends Fragment implements AddPriceTask.OnPostExecuteListener, ListPricesTask.OnPostExecuteListener {
         /**
          * The fragment argument representing the section number for this
          * fragment.
@@ -510,7 +595,9 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static ResultPlaces resultPlaces;
         public static Place place;
-        private List <ItemPrices> itemPricesList;
+        private List <Price> itemPricesList;
+        private LayoutInflater inflater;
+        private View rootView;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -535,9 +622,14 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
 
             final InfosActivity infosActivity = ((InfosActivity) getActivity());
 
-            itemPricesList = new ArrayList<ItemPrices>();
+            Price price = infosActivity.getItemSubmited();
+            new ListPricesTask(infosActivity, price, PricesFragment.this).execute();
 
-            View rootView = inflater.inflate(R.layout.fragment_prices, container, false);
+            itemPricesList = new ArrayList<Price>();
+
+            this.inflater = inflater;
+
+            rootView = inflater.inflate(R.layout.fragment_prices, container, false);
             final LinearLayout containerPrices = (LinearLayout) rootView.findViewById(R.id.containerPrices);
 
             LinearLayout addItem = (LinearLayout) rootView.findViewById(R.id.addPrice);
@@ -550,16 +642,13 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
 
             generateList(inflater, containerPrices, itemPricesList);
 
-            Button button = (Button) infosActivity.findViewById(R.id.savePlace);
+            Button button = (Button) infosActivity.findViewById(R.id.savePrice);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ItemPrices itemPrices = infosActivity.getItemSubmited();
-                    List<ItemPrices> newItemPricesList = new ArrayList<ItemPrices>();
-                    newItemPricesList.add(itemPrices);
-                    newItemPricesList.addAll(itemPricesList);
-                    generateList(inflater, containerPrices, newItemPricesList);
-                    itemPricesList = newItemPricesList;
+
+                    Price price = infosActivity.getItemSubmited();
+                    new AddPriceTask(infosActivity, price, PricesFragment.this).execute();
 
                     infosActivity.closeRightDrawer();
                     infosActivity.resetView();
@@ -569,24 +658,32 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
             return rootView;
         }
 
-        private void generateList(LayoutInflater inflater, LinearLayout containerPrices, List<ItemPrices> itemPricesList) {
-            containerPrices.removeAllViews();
-            for(ItemPrices itemPrices : itemPricesList){
+        private void generateList(LayoutInflater inflater, LinearLayout containerPrices, List<Price> itemPricesList) {
+            if(itemPricesList != null) {
+                containerPrices.removeAllViews();
+                for (Price itemPrices : itemPricesList) {
 
-                View itemLista = inflater.inflate(R.layout.adapter_template_list_prices, null);
-                TextView item = (TextView) itemLista.findViewById(R.id.item);
-                item.setText(itemPrices.getItem());
-                TextView description = (TextView) itemLista.findViewById(R.id.description);
-                description.setText(itemPrices.getDescription());
-                TextView price = (TextView) itemLista.findViewById(R.id.price);
-                price.setText(itemPrices.getPrice());
+                    View itemLista = inflater.inflate(R.layout.adapter_template_list_prices, null);
+                    TextView item = (TextView) itemLista.findViewById(R.id.item);
+                    item.setText(itemPrices.getName());
+                    TextView description = (TextView) itemLista.findViewById(R.id.description);
+                    description.setText(itemPrices.getDescription());
+                    TextView price = (TextView) itemLista.findViewById(R.id.price);
+                    price.setText(itemPrices.getPrice());
 
-                containerPrices.addView(itemLista);
+                    containerPrices.addView(itemLista);
+                }
             }
+        }
+
+        @Override
+        public void onPostExecute(List<Price> result) {
+            final LinearLayout containerPrices = (LinearLayout) rootView.findViewById(R.id.containerPrices);
+            generateList(inflater, containerPrices, result);
         }
     }
 
-    public static class GeneralFragment extends Fragment implements DetailsApiTask.OnPostExecuteListener, DetailsNativeTask.OnPostExecuteListener {
+    public static class GeneralFragment extends Fragment implements DetailsApiTask.OnPostExecuteListener, DetailsNativeTask.OnPostExecuteListener, DetailsApiEditedTask.OnPostExecuteListener {
         /**
          * The fragment argument representing the section number for this
          * fragment.
@@ -600,6 +697,12 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
         private ImageView plusIcon;
         private String plusUrl;
         private String facebookUrl;
+
+        private TextView textViewName;
+        private TextView textViewPhone;
+        private TextView textViewAddress;
+        private TextView textViewSite;
+        private TextView textViewTags;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -625,11 +728,11 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
             final InfosActivity infosActivity = ((InfosActivity) getActivity());
 
             final View rootView = inflater.inflate(R.layout.fragment_infos, container, false);
-            TextView textViewName = (TextView) rootView.findViewById(R.id.name);
-            TextView textViewPhone = (TextView) rootView.findViewById(R.id.phone);
-            TextView textViewAddress = (TextView) rootView.findViewById(R.id.address);
-            TextView textViewUrl = (TextView) rootView.findViewById(R.id.site);
-            TextView textViewTags = (TextView) rootView.findViewById(R.id.type);
+            textViewName = (TextView) rootView.findViewById(R.id.name);
+            textViewPhone = (TextView) rootView.findViewById(R.id.phone);
+            textViewAddress = (TextView) rootView.findViewById(R.id.address);
+            textViewSite = (TextView) rootView.findViewById(R.id.site);
+            textViewTags = (TextView) rootView.findViewById(R.id.type);
 
             addPhone = (ImageView) rootView.findViewById(R.id.addPhone);
             addSite = (ImageView) rootView.findViewById(R.id.addSite);
@@ -641,7 +744,13 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
                 @Override
                 public void onClick(View v) {
                     if(facebookUrl != null) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(facebookUrl)));
+                        try {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(facebookUrl)));
+                        }catch (Exception e){
+                            Toast.makeText(infosActivity, "url mal formada", Toast.LENGTH_LONG).show();
+                        }
+                    }else{
+                        infosActivity.openLeftDrawer(ADD_FACE);
                     }
                 }
             });
@@ -650,7 +759,13 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
                 @Override
                 public void onClick(View v) {
                     if(plusUrl != null) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(plusUrl)));
+                        try{
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(plusUrl)));
+                        }catch (Exception e){
+                            Toast.makeText(infosActivity, "url mal formada", Toast.LENGTH_LONG).show();
+                        }
+                    }else{
+                        infosActivity.openLeftDrawer(ADD_PLUS);
                     }
                 }
             });
@@ -727,7 +842,7 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
                         startActivity(intent);
                     }
                 });
-                new DetailsApiTask(resultPlaces.getPlaceId(), textViewPhone, textViewAddress, textViewUrl, imageView, loading, getActivity(), this).execute();
+                new DetailsApiTask(resultPlaces.getPlaceId(), textViewPhone, textViewAddress, textViewSite, imageView, loading, getActivity(), this).execute();
 
             }else if(resultPlaces == null && place != null) {
                 textViewName.setText(place.getName());
@@ -759,7 +874,7 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
                         startActivity(intent);
                     }
                 });
-                new DetailsNativeTask(place.getId(), textViewPhone, textViewAddress, textViewUrl, imageView, loading, getActivity(), this).execute();
+                new DetailsNativeTask(place.getId(), textViewPhone, textViewAddress, textViewSite, imageView, loading, getActivity(), this).execute();
 
             }else{
             }
@@ -769,35 +884,73 @@ public class InfosActivity extends ActionBarActivity implements ActionBar.TabLis
 
         @Override
         public void onPostExecute(DetailsApiResult detailsApiResult) {
-            if(detailsApiResult.getResult().getFormattedPhoneNumber() == null){
-                addPhone.setVisibility(View.VISIBLE);
-            }if(detailsApiResult.getResult().getUrl() == null){
-                plusIcon.setImageResource(R.drawable.plus_off);
-                addSite.setVisibility(View.VISIBLE);
-            }if(detailsApiResult.getResult().getUrl() != null){
-                plusIcon.setImageResource(R.drawable.plus_on);
-                plusUrl = detailsApiResult.getResult().getUrl();
-            }
+
+            plusIcon.setImageResource(R.drawable.plus_off);
             facebookIcon.setImageResource(R.drawable.facebook_off);
+
+            final InfosActivity infosActivity = ((InfosActivity) getActivity());
+            new DetailsApiEditedTask(infosActivity, new PlaceApiEdited(resultPlaces.getPlaceId()), this).execute();
+
+            if(detailsApiResult != null) {
+
+                if (detailsApiResult.getResult().getFormattedPhoneNumber() == null) {
+                    addPhone.setVisibility(View.VISIBLE);
+                    textViewPhone.setText(getString(R.string.phoneUnavaible));
+                }
+
+                if (detailsApiResult.getResult().getWebsite() == null) {
+                    addSite.setVisibility(View.VISIBLE);
+                    textViewSite.setText(getString(R.string.site_indisponivel));
+                }
+
+                if (detailsApiResult.getResult().getUrl() != null) {
+                    plusIcon.setImageResource(R.drawable.plus_on);
+                    plusUrl = detailsApiResult.getResult().getUrl();
+                }
+            }
+
         }
 
         @Override
         public void onPostExecute(Place place) {
             plusIcon.setImageResource(R.drawable.plus_off);
             facebookIcon.setImageResource(R.drawable.facebook_off);
-            if(place.getPhone() == null){
-                addPhone.setVisibility(View.VISIBLE);
+            if(place != null) {
+                if (place.getPhone() == null || place.getPhone().equals("")) {
+                    addPhone.setVisibility(View.VISIBLE);
+                    textViewPhone.setText(getString(R.string.phoneUnavaible));
+                }
+                if (place.getSite() == null || place.getSite().equals("")) {
+                    addSite.setVisibility(View.VISIBLE);
+                    textViewSite.setText(getString(R.string.site_indisponivel));
+                }
+                if (place.getPlusPage() != null && !place.getPlusPage().equals("")) {
+                    plusIcon.setImageResource(R.drawable.plus_on);
+                    plusUrl = place.getPlusPage();
+                }
+                if (place.getFacebookPage() != null && !place.getFacebookPage().equals("")) {
+                    facebookIcon.setImageResource(R.drawable.facebook_on);
+                    facebookUrl = place.getFacebookPage();
+                }
             }
-            if(place.getSite() == null){
-                addSite.setVisibility(View.VISIBLE);
-            }
-            if(place.getPlusPage() != null){
-                plusIcon.setImageResource(R.drawable.plus_on);
-                plusUrl = place.getPlusPage();
-            }
-            if(place.getFacebookPage() != null){
-                facebookIcon.setImageResource(R.drawable.facebook_on);
-                facebookUrl = place.getFacebookPage();
+        }
+
+        @Override
+        public void onPostExecute(PlaceApiEdited placeApiEdited) {
+            if(placeApiEdited != null) {
+                if (placeApiEdited.getPhone() != null) {
+                    textViewPhone.setText(placeApiEdited.getPhone());
+                    addPhone.setVisibility(View.GONE);
+                }
+                if (placeApiEdited.getSite() != null) {
+                    addSite.setVisibility(View.GONE);
+                    textViewSite.setText(placeApiEdited.getSite());
+                }
+
+                if (placeApiEdited.getFacebookPage() != null) {
+                    facebookIcon.setImageResource(R.drawable.facebook_on);
+                    facebookUrl = placeApiEdited.getFacebookPage();
+                }
             }
         }
     }

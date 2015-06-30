@@ -1,5 +1,6 @@
 package afpcsoft.com.br.bestplaces.controller;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -13,9 +14,12 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.util.Map;
+
 import afpcsoft.com.br.bestplaces.R;
 import afpcsoft.com.br.bestplaces.Utils.ImageUtils;
 import afpcsoft.com.br.bestplaces.model.Place;
+import afpcsoft.com.br.bestplaces.service.DetailsApiEditedTask;
 
 public class DetailsPreviewActivity extends ActionBarActivity {
 
@@ -109,5 +113,12 @@ public class DetailsPreviewActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(DetailsPreviewActivity.this, MapsActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

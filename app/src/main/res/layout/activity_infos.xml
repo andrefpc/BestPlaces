@@ -172,7 +172,7 @@
                             android:padding="10dp"
                             android:gravity="center">
                             <Button
-                                android:id="@+id/savePlace"
+                                android:id="@+id/savePrice"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:gravity="center"
@@ -235,7 +235,6 @@
                     android:padding="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="phone"
                     android:textColor="@android:color/white"/>
 
                 <LinearLayout
@@ -249,6 +248,66 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textUri"
+                        android:textColor="@android:color/white"/>
+                </LinearLayout>
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/layoutFace"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="10dp">
+                <TextView
+                    android:text="@string/addFace"
+                    android:textSize="20sp"
+                    android:padding="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:background="@color/ripple_material_dark">
+                    <EditText
+                        android:id="@+id/faceEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textWebEditText"
+                        android:textColor="@android:color/white"/>
+                </LinearLayout>
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/layoutPlus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="10dp">
+                <TextView
+                    android:text="@string/addPlus"
+                    android:textSize="20sp"
+                    android:padding="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="10dp"
+                    android:background="@color/ripple_material_dark">
+                    <EditText
+                        android:id="@+id/plusEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textWebEditText"
                         android:textColor="@android:color/white"/>
                 </LinearLayout>
 

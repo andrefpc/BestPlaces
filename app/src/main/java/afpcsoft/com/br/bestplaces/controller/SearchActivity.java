@@ -32,20 +32,23 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import afpcsoft.com.br.bestplaces.R;
 import afpcsoft.com.br.bestplaces.Utils.DialogUtils;
+import afpcsoft.com.br.bestplaces.Utils.StaticValues;
 import afpcsoft.com.br.bestplaces.model.Place;
 import afpcsoft.com.br.bestplaces.model.placesApi.PlacesApiResult;
 import afpcsoft.com.br.bestplaces.model.placesApi.ResultPlaces;
 import afpcsoft.com.br.bestplaces.service.DownloadImageTask;
+import afpcsoft.com.br.bestplaces.service.NativePlacesTask;
 import afpcsoft.com.br.bestplaces.service.PlacesApiTask;
 
 /**
  * Created by AndréFelipe on 17/04/2015.
  */
-public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraChangeListener, PlacesApiTask.OnPostExecuteListener {
+public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraChangeListener, PlacesApiTask.OnPostExecuteListener, NativePlacesTask.OnPostExecuteListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private MarkerOptions myLocationMarker;
@@ -54,6 +57,10 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
     private static String RESTAURANT = "restaurant";
     private static String PARKING = "parking";
     private static String GAS_STATION = "gas_station";
+
+    private static String MY_LOCAL = "My Local";
+    private static String PLACES_API = "Places API";
+    private static String PLACES_NATIVE = "Places Native";
 
     PlacesApiResult placesApiResultRestaurant;
     PlacesApiResult placesApiResultParking;
@@ -64,6 +71,7 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
     private RotateAnimation rotation;
 
     Map <String, ResultPlaces> resultPlacesMap;
+    Map <String, Place> nativePlacesMap;
 
 
     private ImageButton refresh;
@@ -83,6 +91,11 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
     private Button setLocationBtn;
     private Profile profile;
     private LatLng locationSetted;
+
+    private LinearLayout layout1;
+    private LinearLayout layout2;
+    private LinearLayout layout3;
+    private LinearLayout layout4;
 
     CameraPosition cameraPosition;
 
@@ -133,6 +146,7 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
         rotation.setDuration(600);
 
         resultPlacesMap = new HashMap<String, ResultPlaces>();
+        nativePlacesMap = new HashMap<String, Place>();
 
         rotation= new RotateAnimation(0f,360f, Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
         rotation.setDuration(600);
@@ -297,6 +311,11 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
     private void generateLayouts() {
 
 
+        layout1 = (LinearLayout) findViewById(R.id.layout1);
+        layout2 = (LinearLayout) findViewById(R.id.layout2);
+        layout3 = (LinearLayout) findViewById(R.id.layout3);
+        layout4 = (LinearLayout) findViewById(R.id.layout4);
+
         zoomIn = (ImageButton) findViewById(R.id.zoomIn);
 //        zoomIn.setVisibility(View.GONE);
         zoomIn.setOnClickListener(new View.OnClickListener() {
@@ -370,9 +389,22 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
 
                 mMap.clear();
 
+                mMap.addMarker(myLocationMarker);
+
+                cameraPosition = new CameraPosition.Builder()
+                        .target(myLocationLatLng)      // Sets the center of the map to Mountain View
+                        .zoom(15)                   // Sets the zoom
+                        .build();
+
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
                 new PlacesApiTask(SearchActivity.this, SearchActivity.this,locationSetted.latitude, locationSetted.longitude, RESTAURANT).execute();
                 new PlacesApiTask(SearchActivity.this, SearchActivity.this,locationSetted.latitude, locationSetted.longitude, PARKING).execute();
                 new PlacesApiTask(SearchActivity.this, SearchActivity.this,locationSetted.latitude, locationSetted.longitude, GAS_STATION).execute();
+
+                new NativePlacesTask(SearchActivity.this, SearchActivity.this, 0).execute();
+                new NativePlacesTask(SearchActivity.this, SearchActivity.this, 1).execute();
+                new NativePlacesTask(SearchActivity.this, SearchActivity.this, 2).execute();
 
             }
         });
@@ -406,9 +438,13 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
                 place = new Place(myLocationLatLng.latitude, myLocationLatLng.longitude);
 
 
-                new PlacesApiTask(SearchActivity.this, SearchActivity.this,myLocationLatLng.latitude, myLocationLatLng.longitude, RESTAURANT).execute();
-                new PlacesApiTask(SearchActivity.this, SearchActivity.this,myLocationLatLng.latitude, myLocationLatLng.longitude, PARKING).execute();
-                new PlacesApiTask(SearchActivity.this, SearchActivity.this,myLocationLatLng.latitude, myLocationLatLng.longitude, GAS_STATION).execute();
+                new PlacesApiTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude, RESTAURANT).execute();
+                new PlacesApiTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude, PARKING).execute();
+                new PlacesApiTask(SearchActivity.this, SearchActivity.this, myLocationLatLng.latitude, myLocationLatLng.longitude, GAS_STATION).execute();
+
+                new NativePlacesTask(SearchActivity.this, SearchActivity.this, 0).execute();
+                new NativePlacesTask(SearchActivity.this, SearchActivity.this, 1).execute();
+                new NativePlacesTask(SearchActivity.this, SearchActivity.this, 2).execute();
 
                 MenuItem item = menu.findItem(R.id.action_add);
                 item.setVisible(true);
@@ -471,21 +507,30 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
             @Override
             public View getInfoWindow(final Marker marker) {
 
-                refresh.setVisibility(View.GONE);
-                location.setVisibility(View.GONE);
-                zoomIn.setVisibility(View.GONE);
-                zoomOut.setVisibility(View.GONE);
-
                 viewGroup = (ViewGroup) getLayoutInflater().inflate(R.layout.info_window_layout, null);
-                LinearLayout layoutInfoWindow = (LinearLayout) viewGroup.findViewById(R.id.layoutInfoWindow);
-                TextView nameInfoWindow = (TextView) viewGroup.findViewById(R.id.name);
-                TextView localInfoWindow = (TextView) viewGroup.findViewById(R.id.endereco);
 
-                nameInfoWindow.setText(marker.getTitle());
-                ResultPlaces resultPlaces = resultPlacesMap.get(marker.getSnippet());
-                localInfoWindow.setText(resultPlaces.getVicinity());
+                layout1.setVisibility(View.GONE);
+                layout2.setVisibility(View.GONE);
+                layout3.setVisibility(View.GONE);
+                layout4.setVisibility(View.GONE);
 
-                layoutInfoWindow.setBackgroundColor(getResources().getColor(R.color.material_blue_grey_800));
+                if(!marker.getTitle().equals(MY_LOCAL) && marker.getTitle().equals(PLACES_API)) {
+                    LinearLayout layoutInfoWindow = (LinearLayout) viewGroup.findViewById(R.id.layoutInfoWindow);
+                    TextView nameInfoWindow = (TextView) viewGroup.findViewById(R.id.name);
+                    TextView localInfoWindow = (TextView) viewGroup.findViewById(R.id.endereco);
+                    ResultPlaces resultPlaces = resultPlacesMap.get(marker.getSnippet());
+                    nameInfoWindow.setText(resultPlaces.getName());
+                    localInfoWindow.setText(resultPlaces.getVicinity());
+                    layoutInfoWindow.setBackgroundColor(getResources().getColor(R.color.material_blue_grey_800));
+                }else if(!marker.getTitle().equals(MY_LOCAL) && marker.getTitle().equals(PLACES_NATIVE)){
+                    LinearLayout layoutInfoWindow = (LinearLayout) viewGroup.findViewById(R.id.layoutInfoWindow);
+                    TextView nameInfoWindow = (TextView) viewGroup.findViewById(R.id.name);
+                    TextView localInfoWindow = (TextView) viewGroup.findViewById(R.id.endereco);
+                    Place place = nativePlacesMap.get(marker.getSnippet());
+                    nameInfoWindow.setText(place.getName());
+                    localInfoWindow.setText(place.getAddress());
+                    layoutInfoWindow.setBackgroundColor(getResources().getColor(R.color.material_blue_grey_800));
+                }
 
                 return viewGroup;
             }
@@ -501,10 +546,10 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                refresh.setVisibility(View.VISIBLE);
-                location.setVisibility(View.VISIBLE);
-                zoomIn.setVisibility(View.VISIBLE);
-                zoomOut.setVisibility(View.VISIBLE);
+                layout1.setVisibility(View.VISIBLE);
+                layout2.setVisibility(View.VISIBLE);
+                layout3.setVisibility(View.VISIBLE);
+                layout4.setVisibility(View.VISIBLE);
             }
         });
 
@@ -512,10 +557,19 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
             @Override
             public void onInfoWindowClick(final Marker marker) {
 
-                Intent intent = new Intent(SearchActivity.this, InfosActivity.class);
-                ResultPlaces resultPlaces = resultPlacesMap.get(marker.getSnippet());
-                intent.putExtra("resultPlaces", resultPlaces);
-                startActivity(intent);
+                if(!marker.getTitle().equals(MY_LOCAL) && marker.getTitle().equals(PLACES_API)) {
+                    Intent intent = new Intent(SearchActivity.this, InfosActivity.class);
+                    ResultPlaces resultPlaces = resultPlacesMap.get(marker.getSnippet());
+                    intent.putExtra("tag", StaticValues.GoogleAPIPlaces);
+                    intent.putExtra("resultPlaces", resultPlaces);
+                    startActivity(intent);
+                }else if(!marker.getTitle().equals(MY_LOCAL) && marker.getTitle().equals(PLACES_NATIVE)) {
+                    Intent intent = new Intent(SearchActivity.this, InfosActivity.class);
+                    Place place = nativePlacesMap.get(marker.getSnippet());
+                    intent.putExtra("tag", StaticValues.NativePlaces);
+                    intent.putExtra("place", place);
+                    startActivity(intent);
+                }
             }
         });
     }
@@ -552,7 +606,7 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
 
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(new LatLng(latitude, longitude))
-                    .title(resultPlaces.getName())
+                    .title(PLACES_API)
                     .snippet(resultPlaces.getId());
 
             if(placesApiResult.getType().equals(RESTAURANT)){
@@ -587,4 +641,46 @@ public class SearchActivity extends BaseActivity implements GoogleMap.OnCameraCh
     }
 
 
+    @Override
+    public void onPostExecute(List<Place> result) {
+        for (Place place: result){
+            Log.i("PLACES NATIVE", "ID: " + place.getId());
+        }
+
+        GenerateMarkersPlacesNative(result);
+    }
+
+    private void GenerateMarkersPlacesNative(List<Place> places) {
+        for (Place place : places){
+            nativePlacesMap.put(String.valueOf(place.getId()), place);
+            double latitude = place.getLat();
+            double longitude = place.getLng();
+
+            Log.i("PLACES_NATIVE", latitude + "/" + longitude);
+
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(new LatLng(latitude, longitude))
+                    .title(PLACES_NATIVE)
+                    .snippet(String.valueOf(place.getId()));
+
+            if(place.getType() == 0){
+                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant));
+            }else if(place.getType() == 1){
+                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.parking));
+            }else if(place.getType() == 2){
+                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.gas_station));
+            }
+
+            if (latitude != 0.0 || longitude != 0.0) {
+                mMap.addMarker(markerOptions);
+                performClickInfoWindow();
+
+            }
+
+            if(rotation.isInitialized()) {
+                rotation.cancel();
+                setTitle(R.string.app_name);
+            }
+        }
+    }
 }

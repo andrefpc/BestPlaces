@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import afpcsoft.com.br.bestplaces.R;
+import afpcsoft.com.br.bestplaces.Utils.DialogUtils;
 import afpcsoft.com.br.bestplaces.Utils.HttpUtils;
 import afpcsoft.com.br.bestplaces.model.Place;
 
@@ -49,9 +50,12 @@ public class NativePlacesTask extends AsyncTask<String, Void, List<Place>> {
         String url = "http://ec2-54-153-109-26.us-west-1.compute.amazonaws.com/Service.php?servico=listPlaces&type=" + type;
         String result = HttpUtils.makeGetRequest(url);
 
-        Gson gson = new Gson();
-        Type listType = new TypeToken<ArrayList<Place>>() {}.getType();
-        List<Place> place = gson.fromJson(result, listType);
+        List<Place> place = null;
+        if(!result.equals("false")) {
+            Gson gson = new Gson();
+            Type listType = new TypeToken<ArrayList<Place>>() {}.getType();
+            place = gson.fromJson(result, listType);
+        }
 
         return place;
     }
@@ -67,7 +71,6 @@ public class NativePlacesTask extends AsyncTask<String, Void, List<Place>> {
                 e.printStackTrace();
             }
         }
-
     }
 
 }

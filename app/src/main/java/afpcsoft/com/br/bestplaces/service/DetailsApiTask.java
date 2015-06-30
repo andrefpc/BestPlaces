@@ -104,7 +104,7 @@ public class DetailsApiTask extends AsyncTask<String, Void, DetailsApiResult> {
         List<PhotoDetails> photos = detailsApiResult.getResult().getPhotos();
         String phoneText = detailsApiResult.getResult().getFormattedPhoneNumber();
         String addressText = detailsApiResult.getResult().getFormattedAddress();
-        String urlText = detailsApiResult.getResult().getUrl();
+        String websiteText = detailsApiResult.getResult().getWebsite();
 
         if(phoneText != null) {
             phone.setText(phoneText);
@@ -119,7 +119,7 @@ public class DetailsApiTask extends AsyncTask<String, Void, DetailsApiResult> {
             address.setText(context.getString(R.string.endereco_indisponivel));
         }
 
-        if(urlText != null){
+        if(websiteText != null){
             website.setText(detailsApiResult.getResult().getWebsite());
             Linkify.addLinks(website, Linkify.ALL);
         }else{

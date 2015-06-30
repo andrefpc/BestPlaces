@@ -9,7 +9,7 @@ import android.os.Bundle;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MyLocation {
+public class MyLocationTask {
     Timer timer1;
     LocationManager lm;
     LocationResult locationResult;

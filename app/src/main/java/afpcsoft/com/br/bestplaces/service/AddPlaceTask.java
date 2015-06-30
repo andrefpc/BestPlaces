@@ -113,7 +113,7 @@ public class AddPlaceTask extends AsyncTask<String, Void, String> {
         super.onPostExecute(result);
         Log.i("HTTP RESULT", result);
 
-        if(result.equals("\t1")){
+        if(result.equals("true")){
             Intent intent = new Intent(context, DetailsPreviewActivity.class);
             intent.putExtra("place", place);
             context.startActivity(intent);

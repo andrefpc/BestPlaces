@@ -3,6 +3,7 @@ package afpcsoft.com.br.bestplaces.service;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import afpcsoft.com.br.bestplaces.R;
+import afpcsoft.com.br.bestplaces.Utils.DialogUtils;
 import afpcsoft.com.br.bestplaces.Utils.HttpUtils;
 import afpcsoft.com.br.bestplaces.model.Place;
 
@@ -61,12 +63,18 @@ public class DetailsNativeTask extends AsyncTask<String, Void, Place> {
     protected Place doInBackground(String... params) {
 
         String url = "http://ec2-54-153-109-26.us-west-1.compute.amazonaws.com/Service.php?servico=detailsPlaces&id=" + id;
+        Log.i("%%%%%%%%%% URL", url);
         String result = HttpUtils.makeGetRequest(url);
-
-        Gson gson = new Gson();
-        Type listType = new TypeToken<ArrayList<Place>>() {}.getType();
-        List<Place> places = gson.fromJson(result, listType);
-        Place place = places.get(0);
+        Place place = null;
+        if(!result.equals("false")) {
+            Gson gson = new Gson();
+            Type listType = new TypeToken<ArrayList<Place>>() {
+            }.getType();
+            List<Place> places = gson.fromJson(result, listType);
+            if(!places.isEmpty()) {
+                place = places.get(0);
+            }
+        }
 
         return place;
     }
@@ -82,38 +90,41 @@ public class DetailsNativeTask extends AsyncTask<String, Void, Place> {
             }
         }
 
-        String photo = place.getImageBase64();
-        String phoneText = place.getPhone();
-        String addressText = place.getAddress();
-        String webSite = place.getSite();
+        if(place != null){
 
-        if(phoneText != null) {
-            phone.setText(phoneText);
-            Linkify.addLinks(phone, Linkify.PHONE_NUMBERS);
-        }else{
-            phone.setText(context.getString(R.string.numero_telefone_indisponivel));
-            phone.setVisibility(View.VISIBLE);
-        }
-        if(addressText != null){
-            address.setText(addressText);
-        }else{
-            address.setText(context.getString(R.string.endereco_indisponivel));
-        }
+            String photo = place.getImageBase64();
+            String phoneText = place.getPhone();
+            String addressText = place.getAddress();
+            String webSite = place.getSite();
 
-        if(webSite != null){
-            website.setText(webSite);
-            Linkify.addLinks(website, Linkify.ALL);
-        }else{
-            website.setText(context.getString(R.string.site_indisponivel));
-            website.setVisibility(View.VISIBLE);
-        }
+            if (phoneText != null) {
+                phone.setText(phoneText);
+                Linkify.addLinks(phone, Linkify.PHONE_NUMBERS);
+            } else {
+                phone.setText(context.getString(R.string.numero_telefone_indisponivel));
+                phone.setVisibility(View.VISIBLE);
+            }
+            if (addressText != null) {
+                address.setText(addressText);
+            } else {
+                address.setText(context.getString(R.string.endereco_indisponivel));
+            }
 
-        if(photo != null) {
-            new LoadBase64ImageTask(imageView, progressBar, photo, context).execute();
-        }else{
-            progressBar.setVisibility(View.GONE);
-            imageView.setVisibility(View.VISIBLE);
-            imageView.setImageResource(R.drawable.no_image);
+            if (webSite != null) {
+                website.setText(webSite);
+                Linkify.addLinks(website, Linkify.ALL);
+            } else {
+                website.setText(context.getString(R.string.site_indisponivel));
+                website.setVisibility(View.VISIBLE);
+            }
+
+            if (photo != null) {
+                new LoadBase64ImageTask(imageView, progressBar, photo, context).execute();
+            } else {
+                progressBar.setVisibility(View.GONE);
+                imageView.setVisibility(View.VISIBLE);
+                imageView.setImageResource(R.drawable.no_image);
+            }
         }
     }
 }

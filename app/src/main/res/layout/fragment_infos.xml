@@ -27,6 +27,7 @@
                 <TextView android:id="@+id/name"
                     android:textSize="25dp"
                     android:gravity="center"
+                    android:text="@string/loading"
                     android:textColor="@android:color/white"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -119,6 +120,7 @@
                     android:id="@+id/address"
                     android:paddingLeft="10dp"
                     android:textSize="15sp"
+                    android:text="@string/loading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"/>
@@ -194,7 +196,7 @@
                         android:background="@drawable/ic_phone"/>
                     <TextView
                         android:id="@+id/phone"
-                        android:text="@string/phoneUnavaible"
+                        android:text="@string/loading"
                         android:textSize="15sp"
                         android:paddingLeft="10dp"
                         android:layout_width="wrap_content"
@@ -237,7 +239,7 @@
                         android:src="@drawable/ic_url"/>
                     <TextView
                         android:id="@+id/site"
-                        android:text="@string/siteUnavaible"
+                        android:text="@string/loading"
                         android:paddingLeft="10dp"
                         android:textSize="15sp"
                         android:layout_width="wrap_content"
@@ -274,6 +276,7 @@
                     android:src="@drawable/ic_tags"/>
                 <TextView
                     android:id="@+id/type"
+                    android:text="@string/loading"
                     android:paddingLeft="10dp"
                     android:textSize="15sp"
                     android:layout_width="wrap_content"

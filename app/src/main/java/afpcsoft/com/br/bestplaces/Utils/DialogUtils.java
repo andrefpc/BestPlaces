@@ -101,7 +101,7 @@ public class DialogUtils {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
         alertDialogBuilder.setCancelable(false);
         alertDialogBuilder.setMessage(context.getString(R.string.errorSendData))
-                .setPositiveButton(context.getString(R.string.dialog_sim), null);
+                .setPositiveButton(context.getString(R.string.dialog_ok), null);
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
     }
